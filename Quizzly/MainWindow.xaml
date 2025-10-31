@@ -17,12 +17,12 @@
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-				<Button Grid.Row="0" Grid.Column="0" Content="Add" Margin="5 5 5 0"/>
-				<Button Grid.Row="0" Grid.Column="1" Content="Remove" Margin="5 5 5 0" />
+				<Button x:Name="add_button" Grid.Row="0" Grid.Column="0" Content="Add" Margin="5 5 5 0" Padding="5"/>
+				<Button x:Name="remove_button" Grid.Row="0" Grid.Column="1" Content="Remove" Margin="0 5 5 0" Padding="5"/>
 			</StackPanel>
 			<ListBox Grid.Row="1" Margin="5 5 5 5" />
 		</Grid>
-		<views:MenuView Grid.Row="0" Grid.ColumnSpan="2" />
+		<views:MenuView Grid.Row="0" Grid.ColumnSpan="2"/>
 		<Button Grid.Row="2" Grid.Column="1" Content="PLACEHOLDER" Margin="5" />
 	</Grid>
 </Window>

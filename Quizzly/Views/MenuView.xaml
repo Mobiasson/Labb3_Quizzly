@@ -9,6 +9,7 @@
 			<MenuItem Header="Add Question" />
 			<MenuItem Header="Remove Question" InputGestureText="Ctrl+R" />
 			<MenuItem Header="Set PackName" Command="{Binding PlayerViewModel.SetPackNameCommand}" />
+			<MenuItem Header="Pack Options" Command="" />
 		</MenuItem>
 	</Menu>
 </UserControl>
