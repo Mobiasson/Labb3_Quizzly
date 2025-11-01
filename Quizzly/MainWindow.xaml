@@ -16,15 +16,18 @@
 				<RowDefinition Height="auto" />
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
-			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-				<Button x:Name="add_button" Grid.Row="0" Grid.Column="0" Content="Add" Margin="5 5 5 0" Padding="5"/>
-				<Button x:Name="remove_button" Grid.Row="0" Grid.Column="1" Content="Remove" Margin="0 5 5 0" Padding="5"/>
-			</StackPanel>
-			<ListBox Grid.Row="1" Margin="5 5 5 5" />
+			<DockPanel HorizontalAlignment="Stretch" LastChildFill="False" Margin="6 5 5 0">
+				<TextBlock Text="{Binding ActivePack.Category}" FontSize="15" DockPanel.Dock="Left" VerticalAlignment="Center" />
+				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+					<Button Content="Add" Margin="5 5 5 0" Padding="5" />
+					<Button Content="Remove" Margin="0 5 0 0" Padding="5" />
+				</StackPanel>
+			</DockPanel>
+			<ListBox Grid.Row="1" Margin="5" ItemsSource="{Binding ActivePack.Questions}" SelectedItem="{Binding ActivePack.SelectedQuestion, Mode=TwoWay}" DisplayMemberPath="Query" />
 		</Grid>
-		<views:MenuView Grid.Row="0" Grid.ColumnSpan="2"/>
-		<Button Grid.Row="2" Grid.Column="1" Content="PLACEHOLDER" Margin="5" />
+		<views:MenuView Grid.Row=" 0" Grid.ColumnSpan=" 2" />
+		<Button Grid.Row=" 2" Grid.Column=" 1" Content=" PLACEHOLDER" Margin=" 5" />
 	</Grid>
 </Window>
 
-	
+	 

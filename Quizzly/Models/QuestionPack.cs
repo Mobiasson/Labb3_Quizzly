@@ -1,7 +1,4 @@
-﻿using Quizzly.Models;
-using System;
-using System.Collections.Generic;
-namespace Quizzly.Models;
+﻿namespace Quizzly.Models;
 
 internal enum Difficulty { Easy, Medium, Hard }
 internal class QuestionPack {
@@ -13,6 +10,7 @@ internal class QuestionPack {
     }
 
     public string Name { get; set; }
+    public string Category { get; set; }
     public Difficulty Difficulty { get; set; }
     public int TimeLimitInSeconds { get; set; }
 

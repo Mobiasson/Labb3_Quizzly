@@ -35,6 +35,14 @@ internal class QuestionPackViewModel : ViewModelBase {
         }
     }
 
+    public string Category {
+        get => _model.Category;
+        set {
+            _model.Category = value;
+            RaisePropertyChanged();
+        }
+    }
+
     public Difficulty Difficulty {
         get => _model.Difficulty;
         set {
