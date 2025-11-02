@@ -3,6 +3,8 @@
 		<MenuItem Header="_File">
 			<MenuItem Header="_New Question Pack" />
 			<Separator />
+			<MenuItem Header="_Import Question Pack" Click="MenuItem_Click" />
+			<Separator />
 			<MenuItem Header="E_xit" />
 		</MenuItem>
 		<MenuItem Header="_Edit">

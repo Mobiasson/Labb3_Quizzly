@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace Quizzly.Command;
-class DelegateCommand : ICommand {
+public class DelegateCommand : ICommand {
     private readonly Action<object?> execute;
     private readonly Func<object?, bool>? canExecute;
 

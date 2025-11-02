@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Net.Http;
 namespace Quizzly.ViewModels;
 
-class MainWindowViewModel : ViewModelBase {
+public class MainWindowViewModel : ViewModelBase {
     public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
     private HttpClient http = new();
     public PlayerViewModel? PlayerViewModel { get; }
@@ -24,7 +24,7 @@ class MainWindowViewModel : ViewModelBase {
     public MainWindowViewModel() {
         PlayerViewModel = new PlayerViewModel(this);
         ConfigurationViewModel = new ConfigurationViewModel(this);
-        var pack = new QuestionPack("RANDOM");
+        var pack = new QuestionPack("");
         ActivePack = new QuestionPackViewModel(pack);
         Packs.Add(ActivePack);
         _ = GetQuestionsFromDatabase();
@@ -52,5 +52,6 @@ class MainWindowViewModel : ViewModelBase {
 
     private static string HtmlDecode(string text) =>
     System.Net.WebUtility.HtmlDecode(text);
+
 
 }

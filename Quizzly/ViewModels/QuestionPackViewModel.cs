@@ -4,8 +4,9 @@ using System.Collections.Specialized;
 
 namespace Quizzly.ViewModels;
 
-internal class QuestionPackViewModel : ViewModelBase {
+public class QuestionPackViewModel : ViewModelBase {
     private readonly QuestionPack _model;
+
 
     public QuestionPackViewModel(QuestionPack model) {
         _model = model;

@@ -11,4 +11,6 @@ public partial class MainWindow : Window {
     private void ConfigurationsView_Loaded(object sender, RoutedEventArgs e) {
 
     }
+
+
 }

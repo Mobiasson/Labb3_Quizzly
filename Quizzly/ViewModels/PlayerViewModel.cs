@@ -1,7 +1,7 @@
 ﻿using Quizzly.Command;
 
 namespace Quizzly.ViewModels;
-class PlayerViewModel : ViewModelBase {
+public class PlayerViewModel : ViewModelBase {
     private readonly MainWindowViewModel? _mainWindowViewModel;
 
     public DelegateCommand SetPackNameCommand { get; }
