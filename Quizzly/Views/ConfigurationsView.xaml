@@ -17,7 +17,7 @@
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
 			<DockPanel HorizontalAlignment="Stretch" LastChildFill="False" Margin="6 5 5 0">
-				<TextBlock Text="{Binding ActivePack.Category}" Margin="10 0 0 0" FontSize="15" DockPanel.Dock="Left" VerticalAlignment="Center" />
+				<TextBlock Text="{Binding ActivePack.Category}" Width="210" Margin="10 0 0 0" FontSize="15" DockPanel.Dock="Left" VerticalAlignment="Center" TextWrapping="Wrap" />
 				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 10 0">
 					<Button Content="Refresh" Margin="0 5 0 0" />
 					<Button Content="Add" Margin="5 5 5 0" Padding="5" />
@@ -27,7 +27,9 @@
 			<ListBox x:Name="question_list" Grid.Row="1" Height="300" Margin="10 10 10 10" BorderBrush="Black" BorderThickness="1" ItemsSource="{Binding ActivePack.Questions}" SelectedItem="{Binding ActivePack.SelectedQuestion, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 				<ListBox.ItemTemplate>
 					<DataTemplate>
-						<TextBlock Text="{Binding Query}" TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+						<TextBlock TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=ActualWidth}">
+						<Run Text="QUESTION: " FontWeight="Bold" />
+						<Run Text="{Binding Query}" /></TextBlock>
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
@@ -37,20 +39,20 @@
 				<RowDefinition Height="0.5*" />
 				<RowDefinition Height="0.5*" />
 			</Grid.RowDefinitions>
-			<TextBox Grid.Row="0" Margin="30" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.Query,Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" />
+			<TextBox Grid.Row="0" Margin="30" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.Query,Mode=OneWay}" TextWrapping="Wrap" />
 			<Grid Grid.Row="1">
 				<Grid.RowDefinitions>
-					<RowDefinition Height="0.5*" />
-					<RowDefinition Height="0.5*" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="40" />
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
-				<TextBox Grid.Row="0" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.CorrectAnswer}" />
-				<TextBox Grid.Row="0" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[0], Mode=OneWay}" />
-				<TextBox Grid.Row="1" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[1], Mode=OneWay}" />
-				<TextBox Grid.Row="1" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=OneWay}" />
+				<TextBox Grid.Row="0" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.CorrectAnswer, Mode=OneWay}" TextWrapping="Wrap" Background="LightGreen" />
+				<TextBox Grid.Row="0" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[0], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
+				<TextBox Grid.Row="1" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[1], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
+				<TextBox Grid.Row="1" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 			</Grid>
 		</Grid>
 	</Grid>

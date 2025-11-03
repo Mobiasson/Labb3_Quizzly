@@ -8,13 +8,13 @@ using System.Net.Http;
 namespace Quizzly.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase {
-    public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
     private HttpClient http = new();
+    private QuestionPackViewModel? _activePack;
+    public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
     public PlayerViewModel? PlayerViewModel { get; }
     public ConfigurationViewModel? ConfigurationViewModel { get; }
     public DelegateCommand RemoveQuestionCommand { get; }
 
-    private QuestionPackViewModel? _activePack;
     public QuestionPackViewModel? ActivePack {
         get => _activePack;
         set {
@@ -33,6 +33,25 @@ public class MainWindowViewModel : ViewModelBase {
         Packs.Add(ActivePack);
         _ = GetQuestionsFromDatabase();
     }
+    public async Task GetQuestionsFromDatabase() {
+        string url = "https://opentdb.com/api.php?amount=10";
+        string json = await http.GetStringAsync(url);
+        var result = JsonConvert.DeserializeObject<ReadJson>(json);
+        string category = result?.results.Count > 0
+            ? HtmlDecode(result.results[0].category)
+            : "No Category";
+        ActivePack.Category = category;
+        ActivePack.Questions.Clear();
+        foreach(var q in result?.results ?? Enumerable.Empty<GetQuestionsFromAPI>()) {
+            ActivePack?.Questions.Add(new Question(
+                query: HtmlDecode(q.question),
+                correctAnswer: HtmlDecode(q.correct_answer),
+                incorrectAnswer1: HtmlDecode(q.incorrect_answers[0]),
+                incorrectAnswer2: HtmlDecode(q.incorrect_answers[1]),
+                incorrectAnswer3: HtmlDecode(q.incorrect_answers[2])
+            ));
+        }
+    }
 
     private void RemoveQuestionExecute(object? param) {
         if(ActivePack?.SelectedQuestion != null) {
@@ -46,25 +65,6 @@ public class MainWindowViewModel : ViewModelBase {
         return ActivePack?.SelectedQuestion != null;
     }
 
-    public async Task GetQuestionsFromDatabase() {
-        string url = "https://opentdb.com/api.php?amount=10";
-        string json = await http.GetStringAsync(url);
-        var result = JsonConvert.DeserializeObject<ReadJson>(json);
-        string category = result?.results.Count > 0
-            ? HtmlDecode(result.results[0].category)
-            : "Unknown";
-        ActivePack.Category = category;
-        ActivePack.Questions.Clear();
-        foreach(var q in result?.results ?? Enumerable.Empty<GetQuestionsFromAPI>()) {
-            ActivePack.Questions.Add(new Question(
-                query: HtmlDecode(q.question),
-                correctAnswer: HtmlDecode(q.correct_answer),
-                incorrectAnswer1: HtmlDecode(q.incorrect_answers[0]),
-                incorrectAnswer2: HtmlDecode(q.incorrect_answers[1]),
-                incorrectAnswer3: HtmlDecode(q.incorrect_answers[2])
-            ));
-        }
-    }
 
     private static string HtmlDecode(string text) =>
         System.Net.WebUtility.HtmlDecode(text);
