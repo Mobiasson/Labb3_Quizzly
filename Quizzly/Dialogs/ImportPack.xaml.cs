@@ -10,12 +10,9 @@ public partial class ImportPack : Window {
     }
 
     private void ImportQuestionPack_Click(object sender, RoutedEventArgs e) {
-        var dialog = new Quizzly.Dialogs.ImportPack();
+        var dialog = new ImportPack();
         if(dialog.ShowDialog() == true) {
         }
     }
 
-    private void Button_Click(object sender, RoutedEventArgs e) {
-
-    }
 }

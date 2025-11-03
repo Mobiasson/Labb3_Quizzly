@@ -1,15 +1,16 @@
-﻿using System.Windows.Controls;
-using Quizzly.Dialogs;
+﻿using Quizzly.Dialogs;
+using System.Windows;
+using System.Windows.Controls;
 
 
-namespace Quizzly.Views; 
+namespace Quizzly.Views;
 public partial class MenuView : UserControl {
     public MenuView() {
         InitializeComponent();
     }
 
-    private void MenuItem_Click(object sender, System.Windows.RoutedEventArgs e) {
-        ImportPack importDialog = new ImportPack();
- 
+    private void MenuItem_Click(object sender, RoutedEventArgs e) {
+        var importDialog = new ImportPack();
+        importDialog.ShowDialog();
     }
 }

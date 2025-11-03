@@ -7,7 +7,6 @@
 		</Grid.RowDefinitions>
 		<Label Content="Category" FontWeight="Bold" />
 		<ComboBox Grid.Row="1" Margin="0 5 0 15" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" DisplayMemberPath="Name" />
-		<Button Grid.Row="2" Content="Import" Width="80" Height="30" HorizontalAlignment="Right" Click="Button_Click" />
 	</Grid>
 </Window>
  

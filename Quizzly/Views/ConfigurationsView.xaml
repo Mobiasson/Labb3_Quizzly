@@ -1,3 +1,57 @@
 ﻿<UserControl x:Class="Quizzly.Views.ConfigurationsView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="clr-namespace:Quizzly.Views" mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800" DataContext="{Binding ConfigurationViewModel}">
-	<Grid></Grid>
-</UserControl>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid Grid.Row="1" Grid.Column="0">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<DockPanel HorizontalAlignment="Stretch" LastChildFill="False" Margin="6 5 5 0">
+				<TextBlock Text="{Binding ActivePack.Category}" Margin="10 0 0 0" FontSize="15" DockPanel.Dock="Left" VerticalAlignment="Center" />
+				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 10 0">
+					<Button Content="Refresh" Margin="0 5 0 0" />
+					<Button Content="Add" Margin="5 5 5 0" Padding="5" />
+					<Button Content="Remove" Margin="0 5 0 0" Padding="5" Command="{Binding RemoveQuestionCommand}" />
+				</StackPanel>
+			</DockPanel>
+			<ListBox x:Name="question_list" Grid.Row="1" Height="300" Margin="10 10 10 10" BorderBrush="Black" BorderThickness="1" ItemsSource="{Binding ActivePack.Questions}" SelectedItem="{Binding ActivePack.SelectedQuestion, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<TextBlock Text="{Binding Query}" TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		</Grid>
+		<Grid Grid.Row="1" Grid.Column="1">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="0.5*" />
+				<RowDefinition Height="0.5*" />
+			</Grid.RowDefinitions>
+			<TextBox Grid.Row="0" Margin="30" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding SelectedQuestion.Query, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" />
+			<Grid Grid.Row="1">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="0.5*" />
+					<RowDefinition Height="0.5*" />
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<TextBox Grid.Row="0" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="Top Right" TextWrapping="Wrap" AcceptsReturn="False" />
+				<TextBox Grid.Row="0" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding SelectedQuestion.CorrectAnswer, Mode=OneWay}" />
+				<TextBox Grid.Row="1" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="Bottom Left" />
+				<TextBox Grid.Row="1" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="Bottom Right" />
+			</Grid>
+		</Grid>
+	</Grid>
+</UserControl> 

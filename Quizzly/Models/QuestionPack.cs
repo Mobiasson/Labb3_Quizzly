@@ -13,6 +13,6 @@ public class QuestionPack {
     public string Category { get; set; }
     public Difficulty Difficulty { get; set; }
     public int TimeLimitInSeconds { get; set; }
-
+    public Question SelectedQuestion { get; set; }
     public List<Question> Questions { get; set; }
 }

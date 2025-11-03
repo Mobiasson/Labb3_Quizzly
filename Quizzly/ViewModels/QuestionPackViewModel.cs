@@ -6,6 +6,7 @@ namespace Quizzly.ViewModels;
 
 public class QuestionPackViewModel : ViewModelBase {
     private readonly QuestionPack _model;
+    private Question? _selectedQuestion;
 
 
     public QuestionPackViewModel(QuestionPack model) {
@@ -56,6 +57,14 @@ public class QuestionPackViewModel : ViewModelBase {
         get => _model.TimeLimitInSeconds;
         set {
             _model.TimeLimitInSeconds = value;
+            RaisePropertyChanged();
+        }
+    }
+
+    public Question? SelectedQuestion {
+        get => _selectedQuestion;
+        set {
+            _selectedQuestion = value;
             RaisePropertyChanged();
         }
     }
