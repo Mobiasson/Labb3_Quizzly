@@ -37,7 +37,7 @@
 				<RowDefinition Height="0.5*" />
 				<RowDefinition Height="0.5*" />
 			</Grid.RowDefinitions>
-			<TextBox Grid.Row="0" Margin="30" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding SelectedQuestion.Query, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" />
+			<TextBox Grid.Row="0" Margin="30" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.Query,Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" />
 			<Grid Grid.Row="1">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="0.5*" />
@@ -47,10 +47,10 @@
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
-				<TextBox Grid.Row="0" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="Top Right" TextWrapping="Wrap" AcceptsReturn="False" />
-				<TextBox Grid.Row="0" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding SelectedQuestion.CorrectAnswer, Mode=OneWay}" />
-				<TextBox Grid.Row="1" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="Bottom Left" />
-				<TextBox Grid.Row="1" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="Bottom Right" />
+				<TextBox Grid.Row="0" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.CorrectAnswer}" />
+				<TextBox Grid.Row="0" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[0], Mode=OneWay}" />
+				<TextBox Grid.Row="1" Grid.Column="0" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[1], Mode=OneWay}" />
+				<TextBox Grid.Row="1" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=OneWay}" />
 			</Grid>
 		</Grid>
 	</Grid>

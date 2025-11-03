@@ -4,5 +4,6 @@ namespace Quizzly.Views;
 public partial class ConfigurationsView : UserControl {
     public ConfigurationsView() {
         InitializeComponent();
+
     }
 }

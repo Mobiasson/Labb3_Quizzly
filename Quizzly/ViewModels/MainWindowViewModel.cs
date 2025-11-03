@@ -50,14 +50,11 @@ public class MainWindowViewModel : ViewModelBase {
         string url = "https://opentdb.com/api.php?amount=10";
         string json = await http.GetStringAsync(url);
         var result = JsonConvert.DeserializeObject<ReadJson>(json);
-
         string category = result?.results.Count > 0
             ? HtmlDecode(result.results[0].category)
             : "Unknown";
-
         ActivePack.Category = category;
         ActivePack.Questions.Clear();
-
         foreach(var q in result?.results ?? Enumerable.Empty<GetQuestionsFromAPI>()) {
             ActivePack.Questions.Add(new Question(
                 query: HtmlDecode(q.question),

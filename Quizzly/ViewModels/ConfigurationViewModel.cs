@@ -19,9 +19,9 @@ public class ConfigurationViewModel : ViewModelBase {
     }
 
     public Question? SelectedQuestion {
-        get => ActivePack?.SelectedQuestion;
+        get => mainWindowViewModel.ActivePack?.SelectedQuestion;
         set {
-            if(ActivePack != null) ActivePack.SelectedQuestion = value;
+            if(mainWindowViewModel?.ActivePack != null) mainWindowViewModel.ActivePack.SelectedQuestion = value;
         }
     }
 

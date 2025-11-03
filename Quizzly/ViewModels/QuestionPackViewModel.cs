@@ -7,8 +7,6 @@ namespace Quizzly.ViewModels;
 public class QuestionPackViewModel : ViewModelBase {
     private readonly QuestionPack _model;
     private Question? _selectedQuestion;
-
-
     public QuestionPackViewModel(QuestionPack model) {
         _model = model;
         Questions = new ObservableCollection<Question>(_model.Questions);
