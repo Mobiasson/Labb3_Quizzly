@@ -1,4 +1,5 @@
-﻿using Quizzly.Models;
+﻿using Quizzly.Command;
+using Quizzly.Models;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
@@ -6,11 +7,17 @@ namespace Quizzly.ViewModels;
 
 public class QuestionPackViewModel : ViewModelBase {
     private readonly QuestionPack _model;
+    private readonly DelegateCommand? _removeCommand;
     private Question? _selectedQuestion;
-    public QuestionPackViewModel(QuestionPack model) {
+    public QuestionPackViewModel(QuestionPack model, DelegateCommand removeCommand) {
         _model = model;
-        Questions = new ObservableCollection<Question>(_model.Questions);
-        Questions.CollectionChanged += Questions_CollectionChanged;
+        _removeCommand = removeCommand;
+        Questions = new ObservableCollection<Question>(model.Questions);
+        PropertyChanged += (s, e) =>
+        {
+            if(e.PropertyName == nameof(SelectedQuestion))
+                _removeCommand?.RaiseCanExecuteChanged();
+        };
     }
 
     private void Questions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {

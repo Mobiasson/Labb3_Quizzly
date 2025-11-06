@@ -9,6 +9,7 @@ namespace Quizzly.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase {
     private HttpClient http = new();
+    private Difficulty _selectedDifficulty = Difficulty.Medium; // Needs to be changed later
     private QuestionPackViewModel? _activePack;
     public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
     public ObservableCollection<CategoryItem> Categories { get; } = new();
@@ -21,9 +22,10 @@ public class MainWindowViewModel : ViewModelBase {
         ConfigurationViewModel = new ConfigurationViewModel(this);
         RemoveQuestionCommand = new DelegateCommand(RemoveQuestionExecute, CanRemoveQuestionExecute);
         _ = LoadCategoriesAsync();
-        var pack = new QuestionPack("");
-        ActivePack = new QuestionPackViewModel(pack);
-        Packs.Add(ActivePack);
+        var pack = new QuestionPack("Default Pack");
+        var packVm = new QuestionPackViewModel(pack, RemoveQuestionCommand);
+        ActivePack = packVm;
+        Packs.Add(packVm);
         _ = GetQuestionsFromDatabase();
     }
 
@@ -46,6 +48,15 @@ public class MainWindowViewModel : ViewModelBase {
         }
     }
 
+    public Difficulty SelectedDifficulty {
+        get => _selectedDifficulty;
+        set {
+            _selectedDifficulty = value;
+            RaisePropertyChanged();
+            _ = GetQuestionsFromDatabase();
+        }
+    }
+
     private void RemoveQuestionExecute(object? param) {
         if(ActivePack?.SelectedQuestion != null) {
             ActivePack.Questions.Remove(ActivePack.SelectedQuestion);
@@ -54,8 +65,11 @@ public class MainWindowViewModel : ViewModelBase {
         }
     }
 
+    private bool CanRemoveQuestionExecute(object? param) => ActivePack?.SelectedQuestion != null;
+
     public async Task GetQuestionsFromDatabase() {
-        string url = "https://opentdb.com/api.php?amount=10&type=multiple";
+        string diff = SelectedDifficulty.ToString().ToLower();
+        string url = $"https://opentdb.com/api.php?amount=10&type=multiple&difficulty={diff}";
         string json = await http.GetStringAsync(url);
         var result = JsonConvert.DeserializeObject<ReadJson>(json);
         string category = result?.results.Count > 0
@@ -83,7 +97,6 @@ public class MainWindowViewModel : ViewModelBase {
             Categories.Add(category);
     }
 
-    private bool CanRemoveQuestionExecute(object? param) => ActivePack?.SelectedQuestion != null;
 
     private static string HtmlDecode(string text) => System.Net.WebUtility.HtmlDecode(text);
 }
