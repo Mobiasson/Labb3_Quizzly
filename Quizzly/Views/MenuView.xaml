@@ -5,13 +5,13 @@
 			<Separator />
 			<MenuItem Header="_Import Question Pack" Click="MenuItem_Click" />
 			<Separator />
-			<MenuItem Header="E_xit" />
+			<MenuItem Header="E_xit" InputGestureText="Ctrl+X" Click="ExitFromMenu"/>
 		</MenuItem>
 		<MenuItem Header="_Edit">
 			<MenuItem Header="Add Question" />
 			<MenuItem Header="Remove Question" InputGestureText="Ctrl+R" Command="{Binding MainWindowViewModel.RemoveQuestionCommand}" />
 			<MenuItem Header="Set PackName" Command="{Binding PlayerViewModel.SetPackNameCommand}" />
-			<MenuItem Header="Pack Options" Command="" />
+			<MenuItem Header="Pack Options"/>
 		</MenuItem>
 	</Menu>
 </UserControl>

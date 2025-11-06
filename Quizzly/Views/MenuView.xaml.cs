@@ -13,4 +13,8 @@ public partial class MenuView : UserControl {
         var importDialog = new ImportPack();
         importDialog.ShowDialog();
     }
+
+    private void ExitFromMenu(object sender, RoutedEventArgs e) {
+        Application.Current.Shutdown();
+    }
 }
