@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Quizzly.Command;
+using Quizzly.Models;
 
-namespace Quizzly.ViewModels {
-    internal class MenuViewModel {
+
+namespace Quizzly.ViewModels;
+public class MenuViewModel : ViewModelBase {
+    public MainWindowViewModel MainWindowViewModel { get; }
+
+    public MenuViewModel(MainWindowViewModel mainWindowViewModel) {
+        MainWindowViewModel = mainWindowViewModel;
     }
 }

@@ -15,11 +15,13 @@ public class MainWindowViewModel : ViewModelBase {
     public ObservableCollection<CategoryItem> Categories { get; } = new();
     public PlayerViewModel? PlayerViewModel { get; }
     public ConfigurationViewModel? ConfigurationViewModel { get; }
+    public MenuViewModel? MenuViewModel { get; }
     public DelegateCommand RemoveQuestionCommand { get; }
 
     public MainWindowViewModel() {
         PlayerViewModel = new PlayerViewModel(this);
         ConfigurationViewModel = new ConfigurationViewModel(this);
+        MenuViewModel = new MenuViewModel(this);
         RemoveQuestionCommand = new DelegateCommand(RemoveQuestionExecute, CanRemoveQuestionExecute);
         _ = LoadCategoriesAsync();
         var pack = new QuestionPack("Default Pack");
