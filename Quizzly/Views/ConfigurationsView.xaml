@@ -53,7 +53,7 @@
 				<TextBox x:Name="incorrect1_textbox" Grid.Row="0" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[0], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 				<TextBox x:Name="incorrect2_textbox" Grid.Row="1" Grid.Column=" 0" Margin=" 10" BorderBrush=" Black" BorderThickness=" 1" HorizontalAlignment=" Stretch" VerticalAlignment=" Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[1], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 				<TextBox x:Name="incorrect3_textbox" Grid.Row="1" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
-				<Button x:Name="AddQuestion_button" Grid.Row="3" Grid.Column="0" Width="auto" Height="auto" Margin="10" Padding="5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Visibility="Hidden" Content="Add Question" Click="AddQuestion_button_Click" />
+				<Button x:Name="AddQuestion_button" Grid.Row="3" Grid.Column="0" Width="auto" Height="auto" Margin="10" Padding="5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Visibility="Hidden" Content="Add Question" Click="AddQuestion_button_Click" /> <!--Test-->
 			</Grid>
 		</Grid>
 	</Grid>
