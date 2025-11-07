@@ -45,5 +45,10 @@ public partial class ConfigurationsView : UserControl {
         incorrect2_textbox.Clear();
         incorrect3_textbox.Clear();
     }
+
+    private void Play_button_Click(object sender, RoutedEventArgs e) {
+        var playWindow = new PlayWindow();
+        playWindow.Show();
+    }
 }
 

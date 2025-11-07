@@ -8,6 +8,7 @@
 		<ScrollViewer Grid.Row="1">
 			<views:ConfigurationsView />
 		</ScrollViewer>
+		<ContentControl Content="{Binding CurrentView}" />
 	</Grid>
 </Window>
 
