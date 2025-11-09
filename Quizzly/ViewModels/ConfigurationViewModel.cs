@@ -5,9 +5,11 @@ using System.Collections.ObjectModel;
 namespace Quizzly.ViewModels;
 public class ConfigurationViewModel : ViewModelBase {
     private readonly MainWindowViewModel? mainWindowViewModel;
+    public DelegateCommand LoadTenQuestionsCommand { get; }
 
     public ConfigurationViewModel(MainWindowViewModel? mainWindowViewModel) {
         this.mainWindowViewModel = mainWindowViewModel;
+        LoadTenQuestionsCommand = new DelegateCommand(_ => mainWindowViewModel?.GetQuestionsFromDatabase());
     }
 
     public QuestionPackViewModel? ActivePack {
@@ -19,7 +21,7 @@ public class ConfigurationViewModel : ViewModelBase {
     }
 
     public Question? SelectedQuestion {
-        get => mainWindowViewModel.ActivePack?.SelectedQuestion;
+        get => mainWindowViewModel?.ActivePack?.SelectedQuestion;
         set {
             if(mainWindowViewModel?.ActivePack != null) mainWindowViewModel.ActivePack.SelectedQuestion = value;
         }

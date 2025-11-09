@@ -20,15 +20,15 @@
 				<TextBlock Text="{Binding ActivePack.Category}" Width="250" Margin="10 0 0 0" FontSize="15" DockPanel.Dock="Left" VerticalAlignment="Center" TextWrapping="Wrap" />
 				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 5 0">
 					<Button Content="Add" Margin="5 5 5 0" Padding="5" Click="Button_Click" />
-					<Button Content="Remove" Margin="0 5 0 0" Padding="5" Command="{Binding RemoveQuestionCommand, UpdateSourceTrigger=PropertyChanged}" />
+					<Button Content="Remove" Margin="0 5 0 0" Padding="5" Command="{Binding RemoveQuestionCommand}" />
 				</StackPanel>
 			</DockPanel>
-			<ListBox x:Name="question_list" Grid.Row="1" Height="auto" Margin="15 5 15 15" BorderBrush="Black" BorderThickness="1" ItemsSource="{Binding ActivePack.Questions}" SelectedItem="{Binding ActivePack.SelectedQuestion, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
+			<ListBox x:Name="question_list" Grid.Row="1" Margin="15 5 15 15" BorderBrush="Black" BorderThickness="1" ItemsSource="{Binding ActivePack.Questions}" SelectedItem="{Binding ActivePack.SelectedQuestion, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
 				<ListBox.ItemTemplate>
 					<DataTemplate>
 						<TextBlock TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=ActualWidth}">
-						<Run Text="QUESTION: " FontWeight="Bold" />
-						<Run Text="{Binding Query}" /></TextBlock>
+                <Run Text="QUESTION: " FontWeight="Bold" />
+                <Run Text="{Binding Query, Mode=OneWay}" /></TextBlock>
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
