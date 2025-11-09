@@ -24,11 +24,11 @@ public class MainWindowViewModel : ViewModelBase {
         MenuViewModel = new MenuViewModel(this);
         RemoveQuestionCommand = new DelegateCommand(RemoveQuestionExecute, CanRemoveQuestionExecute);
         _ = LoadCategoriesAsync();
+        _ = GetQuestionsFromDatabase();
         var pack = new QuestionPack("Default Pack");
         var packVm = new QuestionPackViewModel(pack, RemoveQuestionCommand);
         ActivePack = packVm;
         Packs.Add(packVm);
-        _ = GetQuestionsFromDatabase();
     }
 
     public QuestionPackViewModel? ActivePack {
@@ -77,7 +77,6 @@ public class MainWindowViewModel : ViewModelBase {
         string category = result?.results.Count > 0
             ? HtmlDecode(result.results[0].category)
             : "No Category";
-        ActivePack.Category = category;
         ActivePack.Questions.Clear();
         foreach(var q in result?.results ?? Enumerable.Empty<GetQuestionsFromAPI>()) {
             ActivePack?.Questions.Add(new Question(

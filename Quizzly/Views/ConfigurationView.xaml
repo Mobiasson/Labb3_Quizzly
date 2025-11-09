@@ -19,11 +19,11 @@
 			<DockPanel HorizontalAlignment="Stretch" LastChildFill="False" Margin="6 5 5 0">
 				<TextBlock Text="{Binding ActivePack.Category}" Width="250" Margin="10 0 0 0" FontSize="15" DockPanel.Dock="Left" VerticalAlignment="Center" TextWrapping="Wrap" />
 				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 5 0">
-					<Button Content="Add" Margin="5 5 5 0" Padding="5" />
+					<Button Content="Add" Margin="5 5 5 0" Padding="5" Click="Button_Click" />
 					<Button Content="Remove" Margin="0 5 0 0" Padding="5" Command="{Binding RemoveQuestionCommand, UpdateSourceTrigger=PropertyChanged}" />
 				</StackPanel>
 			</DockPanel>
-			<ListBox x:Name="question_list" Grid.Row="1" Height="auto" Margin="15 5 15 15" BorderBrush="Black" BorderThickness="1" ItemsSource="{Binding ActivePack.Questions}" SelectedItem="{Binding ActivePack.SelectedQuestion, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+			<ListBox x:Name="question_list" Grid.Row="1" Height="auto" Margin="15 5 15 15" BorderBrush="Black" BorderThickness="1" ItemsSource="{Binding ActivePack.Questions}" SelectedItem="{Binding ActivePack.SelectedQuestion, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
 				<ListBox.ItemTemplate>
 					<DataTemplate>
 						<TextBlock TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=ActualWidth}">
@@ -54,8 +54,8 @@
 				<TextBox x:Name="incorrect1_textbox" Grid.Row="0" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[0], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 				<TextBox x:Name="incorrect2_textbox" Grid.Row="1" Grid.Column=" 0" Margin=" 10" BorderBrush=" Black" BorderThickness=" 1" HorizontalAlignment=" Stretch" VerticalAlignment=" Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[1], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 				<TextBox x:Name="incorrect3_textbox" Grid.Row="1" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
-				<Button x:Name="AddQuestion_button" Grid.Row="3" Grid.Column="0" Width="auto" Height="auto" Margin="15" Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden" Content="Add Question"  />
-				<Button x:Name="Play_button" Content="PLAY" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="auto" Height="auto" Margin="15" Padding="5" />
+				<Button x:Name="AddQuestion_button" Grid.Row="3" Grid.Column="0" Width="auto" Height="auto" Margin="15" Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden" Content="Add Question" Click="AddQuestion_button_Click" />
+				<Button x:Name="Play_button" Content="PLAY" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="auto" Height="auto" Margin="15" Padding="5" Click="Play_button_Click" />
 			</Grid>
 		</Grid>
 	</Grid>
