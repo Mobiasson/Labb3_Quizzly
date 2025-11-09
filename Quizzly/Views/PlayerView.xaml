@@ -5,6 +5,7 @@
 			<RowDefinition Height="2*" />
 		</Grid.RowDefinitions>
 		<TextBlock Text="{Binding ActivePack.Name}" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />
+		<Button Content="BACK" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5" Padding="5" Click="Back_Click"/>
 		<UniformGrid Grid.Row="1" Rows="2" Columns="2" Margin="20">
 			<Button Content="{Binding Answers[0].Text}" Command="{Binding Answers[0].SelectCommand}" Background="LightGray" />
 			<Button Content="{Binding Answers[1].Text}" Command="{Binding Answers[1].SelectCommand}" Background="LightGray" />

@@ -2,11 +2,11 @@
 using Quizzly.Command;
 using Quizzly.Http;
 using Quizzly.Models;
+using Quizzly.Views;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Windows;
 
 namespace Quizzly.ViewModels {
     public class MainWindowViewModel : ViewModelBase {
@@ -15,14 +15,20 @@ namespace Quizzly.ViewModels {
         private QuestionPackViewModel? _activePack;
         private CategoryItem? _selectedCategory;
         private readonly string _filePath;
-
         public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
         public ObservableCollection<CategoryItem> Categories { get; } = new();
-        public PlayerViewModel? PlayerViewModel { get; }
-        public ConfigurationViewModel? ConfigurationViewModel { get; }
-        public MenuViewModel? MenuViewModel { get; }
+        public ConfigurationViewModel ConfigVM { get; }
+        public PlayerViewModel PlayerVM { get; }
+        public MenuViewModel MenuVM { get; }
+        public ConfigurationView ConfigView { get; }
+        public PlayerView PlayerViewInstance { get; }
         public DelegateCommand RemoveQuestionCommand { get; }
         public DelegateCommand RemovePackCommand { get; }
+        private object? _currentView;
+        public object? CurrentView {
+            get => _currentView;
+            set { _currentView = value; RaisePropertyChanged(); }
+        }
 
         public MainWindowViewModel() {
             var folder = Path.Combine(
@@ -32,10 +38,14 @@ namespace Quizzly.ViewModels {
             Directory.CreateDirectory(folder);
             RemoveQuestionCommand = new DelegateCommand(RemoveQuestionExecute, CanRemoveQuestionExecute);
             RemovePackCommand = new DelegateCommand(RemovePackExecute, CanRemovePackExecute);
-            PlayerViewModel = new PlayerViewModel(this);
-            ConfigurationViewModel = new ConfigurationViewModel(this);
-            MenuViewModel = new MenuViewModel(this);
+            ConfigVM = new ConfigurationViewModel(this);
+            PlayerVM = new PlayerViewModel(this);
+            MenuVM = new MenuViewModel(this);
+            ConfigView = new ConfigurationView { DataContext = ConfigVM };
+            PlayerViewInstance = new PlayerView { DataContext = PlayerVM };
+            CurrentView = ConfigView;
             LoadPacks();
+            _ = LoadCategoriesAsync();
             if(Packs.Count == 0) {
                 var defaultPack = new QuestionPack("Default Pack");
                 var packVm = new QuestionPackViewModel(defaultPack, RemovePackCommand);
@@ -46,8 +56,6 @@ namespace Quizzly.ViewModels {
             else {
                 ActivePack = Packs[0];
             }
-
-            _ = LoadCategoriesAsync();
         }
 
         public QuestionPackViewModel? ActivePack {
@@ -59,23 +67,6 @@ namespace Quizzly.ViewModels {
             }
         }
 
-        public CategoryItem? SelectedCategory {
-            get => _selectedCategory;
-            set {
-                _selectedCategory = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public Difficulty SelectedDifficulty {
-            get => _selectedDifficulty;
-            set {
-                _selectedDifficulty = value;
-                RaisePropertyChanged();
-                _ = GetQuestionsFromDatabase();
-            }
-        }
-
         private void RemoveQuestionExecute(object? param) {
             if(ActivePack?.SelectedQuestion != null) {
                 ActivePack.Questions.Remove(ActivePack.SelectedQuestion);
@@ -84,28 +75,21 @@ namespace Quizzly.ViewModels {
             }
         }
 
-        private bool CanRemoveQuestionExecute(object? param) => ActivePack?.SelectedQuestion != null;
-
         private void RemovePackExecute(object? param) {
             if(param is QuestionPackViewModel packVm && Packs.Contains(packVm)) {
                 Packs.Remove(packVm);
-                if(ActivePack == packVm)
-                    ActivePack = Packs.FirstOrDefault();
+                ActivePack = Packs.FirstOrDefault();
             }
         }
 
-        private bool CanRemovePackExecute(object? param) => param is QuestionPackViewModel;
-
         public async Task GetQuestionsFromDatabase() {
             if(ActivePack == null) return;
-            string diff = SelectedDifficulty.ToString().ToLower();
+
+            string diff = _selectedDifficulty.ToString().ToLower();
             string url = $"https://opentdb.com/api.php?amount=10&type=multiple&difficulty={diff}";
             string json = await http.GetStringAsync(url);
             var result = JsonConvert.DeserializeObject<ReadJson>(json);
-            if(result?.results == null || result.results.Count == 0) {
-                MessageBox.Show("No questions from API.");
-                return;
-            }
+            if(result?.results == null || result.results.Count == 0) return;
             string category = HtmlDecode(result.results[0].category);
             ActivePack.Category = category;
             ActivePack.Questions.Clear();
@@ -118,7 +102,6 @@ namespace Quizzly.ViewModels {
                     incorrectAnswer3: HtmlDecode(q.incorrect_answers[2])
                 ));
             }
-            MessageBox.Show($"Loaded 10 questions: {category}");
         }
 
         public async Task LoadCategoriesAsync() {
@@ -126,13 +109,13 @@ namespace Quizzly.ViewModels {
             string json = await http.GetStringAsync(url);
             var resp = JsonConvert.DeserializeObject<CategoryResponse>(json);
             Categories.Clear();
-            foreach(var category in resp?.trivia_categories ?? Enumerable.Empty<CategoryItem>())
-                Categories.Add(category);
+            foreach(var c in resp?.trivia_categories ?? Enumerable.Empty<CategoryItem>())
+                Categories.Add(c);
         }
 
         private void SavePacks() {
-            var rawPacks = Packs.Select(vm => vm.Model).ToList();
-            var json = JsonConvert.SerializeObject(rawPacks, Formatting.Indented);
+            var raw = Packs.Select(vm => vm.Model).ToList();
+            var json = JsonConvert.SerializeObject(raw, Formatting.Indented);
             File.WriteAllText(_filePath, json);
         }
 
@@ -140,18 +123,20 @@ namespace Quizzly.ViewModels {
             if(!File.Exists(_filePath)) return;
             var json = File.ReadAllText(_filePath).Trim();
             if(string.IsNullOrWhiteSpace(json) || json == "[]") return;
+
             var packs = JsonConvert.DeserializeObject<List<QuestionPack>>(json);
-            if(packs == null || packs.Count == 0) return;
+            if(packs == null) return;
+
             foreach(var p in packs) {
                 var vm = new QuestionPackViewModel(p, RemovePackCommand);
                 Packs.Add(vm);
             }
         }
-
+        private bool CanRemovePackExecute(object? param) => param is QuestionPackViewModel;
+        private bool CanRemoveQuestionExecute(object? param) => ActivePack?.SelectedQuestion != null;
+        public void SwitchToPlayer() => CurrentView = PlayerViewInstance;
+        public void SwitchToConfiguration() => CurrentView = ConfigView;
+        public void OnWindowClosing() => SavePacks();
         private static string HtmlDecode(string text) => WebUtility.HtmlDecode(text);
-
-        public void OnWindowClosing() {
-            SavePacks();
-        }
     }
 }

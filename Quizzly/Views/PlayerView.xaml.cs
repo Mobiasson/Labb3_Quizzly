@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using Quizzly.ViewModels;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -9,8 +11,8 @@ public partial class PlayerView : UserControl {
         InitializeComponent();
     }
 
-    private void Label_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
-
+    private void Back_Click(object sender, RoutedEventArgs e) {
+        var mainVm = (MainWindowViewModel)Application.Current.MainWindow.DataContext;
+        mainVm.SwitchToConfiguration();
     }
-
 }

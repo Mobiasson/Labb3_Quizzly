@@ -6,8 +6,7 @@
 		</Grid.RowDefinitions>
 		<views:MenuView Grid.Row="0" />
 		<ScrollViewer Grid.Row="1">
-			<views:ConfigurationView />
-			<!--<views:PlayerView />-->
+			<ContentControl Content="{Binding CurrentView}" />
 		</ScrollViewer>
 	</Grid>
 </Window>
