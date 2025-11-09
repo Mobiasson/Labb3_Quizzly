@@ -6,8 +6,8 @@
 		</Grid.RowDefinitions>
 		<views:MenuView Grid.Row="0" />
 		<ScrollViewer Grid.Row="1">
-			<!--<views:ConfigurationsView />-->
-			<views:PlayerView />
+			<views:ConfigurationView />
+			<!--<views:PlayerView />-->
 		</ScrollViewer>
 	</Grid>
 </Window>
