@@ -27,8 +27,8 @@
 				<ListBox.ItemTemplate>
 					<DataTemplate>
 						<TextBlock TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=ActualWidth}">
-                <Run Text="QUESTION: " FontWeight="Bold" />
-                <Run Text="{Binding Query, Mode=OneWay}" /></TextBlock>
+							<Run Text="QUESTION: " FontWeight="Bold" />
+							<Run Text="{Binding Query, Mode=OneWay}" /></TextBlock>
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
@@ -55,7 +55,8 @@
 				<TextBox x:Name="incorrect2_textbox" Grid.Row="1" Grid.Column=" 0" Margin=" 10" BorderBrush=" Black" BorderThickness=" 1" HorizontalAlignment=" Stretch" VerticalAlignment=" Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[1], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 				<TextBox x:Name="incorrect3_textbox" Grid.Row="1" Grid.Column="1" Margin="10" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 				<Button x:Name="AddQuestion_button" Grid.Row="3" Grid.Column="0" Width="auto" Height="auto" Margin="15" Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden" Content="Add Question" Click="AddQuestion_button_Click" />
-				<Button x:Name="Play_button" Content="PLAY" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="auto" Height="auto" Margin="15" Padding="5" Click="Play_button_Click" />
+				<Button Content="PLAY" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="15" Padding="12,6" FontSize="16" FontWeight="Bold" Command="{Binding DataContext.PlayCommand, 
+                         RelativeSource={RelativeSource AncestorType=Window}}" />
 			</Grid>
 		</Grid>
 	</Grid>

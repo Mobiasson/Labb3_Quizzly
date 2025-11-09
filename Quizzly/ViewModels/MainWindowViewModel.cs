@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Windows;
 
 namespace Quizzly.ViewModels {
     public class MainWindowViewModel : ViewModelBase {
@@ -14,6 +15,9 @@ namespace Quizzly.ViewModels {
         private Difficulty _selectedDifficulty = Difficulty.Medium;
         private QuestionPackViewModel? _activePack;
         private CategoryItem? _selectedCategory;
+        private object? _currentView;
+        private Question? _currentQuestion;
+
         private readonly string _filePath;
         public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
         public ObservableCollection<CategoryItem> Categories { get; } = new();
@@ -24,11 +28,7 @@ namespace Quizzly.ViewModels {
         public PlayerView PlayerViewInstance { get; }
         public DelegateCommand RemoveQuestionCommand { get; }
         public DelegateCommand RemovePackCommand { get; }
-        private object? _currentView;
-        public object? CurrentView {
-            get => _currentView;
-            set { _currentView = value; RaisePropertyChanged(); }
-        }
+        public DelegateCommand PlayCommand { get; }
 
         public MainWindowViewModel() {
             var folder = Path.Combine(
@@ -38,6 +38,7 @@ namespace Quizzly.ViewModels {
             Directory.CreateDirectory(folder);
             RemoveQuestionCommand = new DelegateCommand(RemoveQuestionExecute, CanRemoveQuestionExecute);
             RemovePackCommand = new DelegateCommand(RemovePackExecute, CanRemovePackExecute);
+            PlayCommand = new DelegateCommand(ExecutePlay, CanPlay);
             ConfigVM = new ConfigurationViewModel(this);
             PlayerVM = new PlayerViewModel(this);
             MenuVM = new MenuViewModel(this);
@@ -52,10 +53,50 @@ namespace Quizzly.ViewModels {
                 Packs.Add(packVm);
                 ActivePack = packVm;
                 _ = GetQuestionsFromDatabase();
-            }
-            else {
+            } else {
                 ActivePack = Packs[0];
             }
+            PickRandomQuestion();
+        }
+
+        private async void ExecutePlay(object? param) {
+            if(ActivePack == null) return;
+            if(ActivePack.Questions.Count == 0) {
+                var result = MessageBox.Show("Load 10 questions from API?", "No Questions", MessageBoxButton.YesNo);
+                if(result == MessageBoxResult.Yes) {
+                    await GetQuestionsFromDatabase();
+                } else {
+                    return;
+                }
+            }
+            var playerVM = new PlayerViewModel(this);
+            playerVM.StartQuiz();
+            CurrentView = new PlayerView { DataContext = playerVM };
+        }
+
+        private bool CanPlay(object? param) => ActivePack?.Questions.Count > 0;
+
+        public void PickRandomQuestion() {
+            if(ActivePack?.Questions.Count > 0) {
+                var rnd = new Random();
+                int index = rnd.Next(ActivePack.Questions.Count);
+                CurrentQuestion = ActivePack.Questions[index];
+            } else {
+                CurrentQuestion = null;
+            }
+        }
+
+        public Question? CurrentQuestion {
+            get => _currentQuestion;
+            set {
+                _currentQuestion = value;
+                RaisePropertyChanged(nameof(CurrentQuestion));
+            }
+        }
+
+        public object? CurrentView {
+            get => _currentView;
+            set { _currentView = value; RaisePropertyChanged(); }
         }
 
         public QuestionPackViewModel? ActivePack {
@@ -63,7 +104,7 @@ namespace Quizzly.ViewModels {
             set {
                 _activePack = value;
                 RaisePropertyChanged();
-                RemoveQuestionCommand.RaiseCanExecuteChanged();
+                PickRandomQuestion();
             }
         }
 
@@ -84,7 +125,6 @@ namespace Quizzly.ViewModels {
 
         public async Task GetQuestionsFromDatabase() {
             if(ActivePack == null) return;
-
             string diff = _selectedDifficulty.ToString().ToLower();
             string url = $"https://opentdb.com/api.php?amount=10&type=multiple&difficulty={diff}";
             string json = await http.GetStringAsync(url);
