@@ -7,11 +7,10 @@
 		<TextBlock Text="{Binding CurrentQuestion.Query}" Width="auto" Height="auto" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Padding="5" Margin="5" />
 		<Button Content="BACK" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5" Padding="5" Click="Back_Click" />
 		<UniformGrid Grid.Row="1" Rows="2" Columns="2" Margin="20">
-			<Button x:Name="button1_answer" Content="{Binding Answers[0].Text}" Command="{Binding Answers[0].SelectCommand}" CommandParameter="{Binding Answers[0].Text}" Margin="8" Padding="20" FontSize="18" Background="LightGray" />
-			<Button x:Name="button2_answer" Content="{Binding Answers[1].Text}" Command="{Binding Answers[1].SelectCommand}" CommandParameter="{Binding Answers[1].Text}" Margin="8" Padding="20" FontSize="18" Background="LightGray" />
-			<Button x:Name="button3_answer" Content="{Binding Answers[2].Text}" Command="{Binding Answers[2].SelectCommand}" CommandParameter="{Binding Answers[2].Text}" Margin="8" Padding="20" FontSize="18" Background="LightGray" />
-			<Button x:Name="button4_answer" Content="{Binding Answers[3].Text}" Command="{Binding Answers[3].SelectCommand}" CommandParameter="{Binding Answers[3].Text}" Margin="8" Padding="20" FontSize="18" Background="LightGray" />
+			<Button Content="{Binding Answers[0].Text}" Command="{Binding Answers[0].SelectCommand}" CommandParameter="{Binding Answers[0].Text}" Margin="8" Padding="20" FontSize="18" Background="{Binding Answers[0].Background, Mode=OneWay}" />
+			<Button x:Name="button2_answer" Content="{Binding Answers[1].Text}" Command="{Binding Answers[1].SelectCommand}" CommandParameter="{Binding Answers[1].Text}" Margin="8" Padding="20" FontSize="18" Background="{Binding Answers[1].Background}" />
+			<Button x:Name="button3_answer" Content="{Binding Answers[2].Text}" Command="{Binding Answers[2].SelectCommand}" CommandParameter="{Binding Answers[2].Text}" Margin="8" Padding="20" FontSize="18" Background="{Binding Answers[2].Background}" />
+			<Button x:Name="button4_answer" Content="{Binding Answers[3].Text}" Command="{Binding Answers[3].SelectCommand}" CommandParameter="{Binding Answers[3].Text}" Margin="8" Padding="20" FontSize="18" Background="{Binding Answers[3].Background}" />
 		</UniformGrid>
 	</Grid>
 </UserControl>
-

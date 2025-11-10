@@ -2,11 +2,24 @@
 using Quizzly.Models;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Quizzly.ViewModels;
 public class AnswerOption : ViewModelBase {
+    private static readonly Brush DefaultBackground = Brushes.LightGray;
+    private Brush _background = DefaultBackground;
     public string Text { get; }
     public DelegateCommand SelectCommand { get; }
+
+    public Brush Background {
+        get => _background;
+        set {
+            if(_background != value) {
+                _background = value;
+                RaisePropertyChanged(nameof(Background));
+            }
+        }
+    }
 
     public AnswerOption(string text, DelegateCommand selectCommand) {
         Text = text;
@@ -69,9 +82,11 @@ public class PlayerViewModel : ViewModelBase {
             .OrderBy(_ => _rnd.Next())
             .ToList();
         var selectCmd = new DelegateCommand(answerObj => {
-            var answer = (string)answerObj!;
-            bool isCorrect = answer == CurrentQuestion.CorrectAnswer;
-            MessageBox.Show(isCorrect ? "Correct!" : $"Wrong! Correct answer: {CurrentQuestion.CorrectAnswer}");
+            var clickedText = (string)answerObj!;
+            bool isCorrect = clickedText == CurrentQuestion.CorrectAnswer;
+            foreach(var opt in Answers) opt.Background = Brushes.LightGray;
+            var clicked = Answers.First(o => o.Text == clickedText);
+            clicked.Background = isCorrect ? Brushes.Green : Brushes.IndianRed;
             _currentIndex++;
             ShowCurrentQuestion();
         });
