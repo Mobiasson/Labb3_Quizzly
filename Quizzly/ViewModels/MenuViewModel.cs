@@ -1,12 +1,14 @@
 ﻿using Quizzly.Command;
-using Quizzly.Models;
+using Quizzly.ViewModels;
 
+namespace Quizzly.ViewModels {
+    public class MenuViewModel : ViewModelBase {
+        private readonly MainWindowViewModel _mainVm;
 
-namespace Quizzly.ViewModels;
-public class MenuViewModel : ViewModelBase {
-    public MainWindowViewModel MainWindowViewModel { get; }
+        public MenuViewModel(MainWindowViewModel mainVm) {
+            _mainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
+        }
 
-    public MenuViewModel(MainWindowViewModel mainWindowViewModel) {
-        MainWindowViewModel = mainWindowViewModel;
+        public DelegateCommand RemoveQuestionCommand => _mainVm.RemoveQuestionCommand;
     }
 }

@@ -74,6 +74,17 @@ namespace Quizzly.ViewModels {
             CurrentView = new PlayerView { DataContext = playerVM };
         }
 
+        public Question? SelectedQuestion {
+            get => ActivePack?.SelectedQuestion;
+            set {
+                if(ActivePack != null) {
+                    ActivePack.SelectedQuestion = value;
+                    RaisePropertyChanged();
+                    RemoveQuestionCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+
         private bool CanPlay(object? param) => ActivePack?.Questions.Count > 0;
 
         public void PickRandomQuestion() {
@@ -105,6 +116,7 @@ namespace Quizzly.ViewModels {
                 _activePack = value;
                 RaisePropertyChanged();
                 PickRandomQuestion();
+                RemoveQuestionCommand.RaiseCanExecuteChanged();
             }
         }
 

@@ -3,6 +3,7 @@ using Quizzly.Models;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Windows;
 
 namespace Quizzly.ViewModels {
     public class QuestionPackViewModel : ViewModelBase {
@@ -16,8 +17,7 @@ namespace Quizzly.ViewModels {
             _removePackCommand = removePackCommand;
             Questions = new ObservableCollection<Question>(model.Questions);
             Questions.CollectionChanged += Questions_CollectionChanged;
-            PropertyChanged += (s, e) =>
-            {
+            PropertyChanged += (s, e) => {
                 if(e.PropertyName == nameof(SelectedQuestion))
                     _removePackCommand?.RaiseCanExecuteChanged();
             };
@@ -51,6 +51,8 @@ namespace Quizzly.ViewModels {
                 _selectedQuestion = value;
                 _model.SelectedQuestion = value;
                 RaisePropertyChanged();
+                var mainVm = Application.Current.MainWindow?.DataContext as MainWindowViewModel;
+                mainVm?.RemoveQuestionCommand.RaiseCanExecuteChanged();
             }
         }
 
