@@ -14,4 +14,9 @@ public partial class MenuView : UserControl {
     private void ExitFromMenu(object sender, RoutedEventArgs e) {
         Application.Current.Shutdown();
     }
+
+    private void MenuItem_Click(object sender, RoutedEventArgs e) {
+        var importPack = new ImportPack();
+        importPack.Show();
+    }
 }
