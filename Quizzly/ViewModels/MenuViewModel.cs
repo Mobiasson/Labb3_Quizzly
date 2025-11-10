@@ -1,5 +1,4 @@
 ﻿using Quizzly.Command;
-using Quizzly.ViewModels;
 
 namespace Quizzly.ViewModels {
     public class MenuViewModel : ViewModelBase {

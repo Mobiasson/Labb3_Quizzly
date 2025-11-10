@@ -11,11 +11,6 @@ public partial class MenuView : UserControl {
         InitializeComponent();
     }
 
-    private void MenuItem_Click(object sender, RoutedEventArgs e) {
-        var importDialog = new ImportPack();
-        importDialog.ShowDialog();
-    }
-
     private void ExitFromMenu(object sender, RoutedEventArgs e) {
         Application.Current.Shutdown();
     }

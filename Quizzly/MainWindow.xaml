@@ -4,7 +4,7 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<views:MenuView Grid.Row="0" />
+		<views:MenuView Grid.Row="0" DataContext="{Binding MenuVM}" />
 		<ScrollViewer Grid.Row="1">
 			<ContentControl Content="{Binding CurrentView}" />
 		</ScrollViewer>
