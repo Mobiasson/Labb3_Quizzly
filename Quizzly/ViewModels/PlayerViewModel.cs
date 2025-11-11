@@ -1,8 +1,10 @@
 ﻿using Quizzly.Command;
 using Quizzly.Models;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Quizzly.ViewModels;
 public class AnswerOption : ViewModelBase {
@@ -28,15 +30,19 @@ public class AnswerOption : ViewModelBase {
 }
 
 public class PlayerViewModel : ViewModelBase {
+    private readonly MainWindowViewModel _mainVm;
+    private readonly Random _rnd = new();
+    private readonly DispatcherTimer _timer;
+    private readonly Stopwatch _stopwatch;
+    private int[]? shuffles;
+    private int _currentIndex = -1;
+    private int _initialSeconds = 30;
+    private TimeSpan _timeRemaining = TimeSpan.Zero;
     public ObservableCollection<AnswerOption> Answers { get; } = new();
     public QuestionPackViewModel ActivePack => _mainVm.ActivePack!;
     public DelegateCommand BackCommand { get; }
-    private readonly Random _rnd = new();
-    private int[]? _shuffledIndices;
-    private int _currentIndex = -1;
-    private readonly MainWindowViewModel _mainVm;
-
     private Question? _currentQuestion;
+
     public Question? CurrentQuestion {
         get => _currentQuestion;
         set {
@@ -46,9 +52,24 @@ public class PlayerViewModel : ViewModelBase {
         }
     }
 
+    public TimeSpan TimeRemaining {
+        get => _timeRemaining;
+        private set {
+            if(_timeRemaining != value) {
+                _timeRemaining = value;
+                RaisePropertyChanged(nameof(TimeRemaining));
+                RaisePropertyChanged(nameof(TimeRemainingDisplay));
+            }
+        }
+    }
+    public string TimeRemainingDisplay => TimeRemaining.ToString(@"mm\:ss");
+
     public PlayerViewModel(MainWindowViewModel mainVm) {
         _mainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
         BackCommand = new DelegateCommand(_ => _mainVm.SwitchToConfiguration());
+        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        _timer.Tick += Timer_Tick;
+        _stopwatch = new Stopwatch();
     }
 
     public void StartQuiz() {
@@ -57,7 +78,7 @@ public class PlayerViewModel : ViewModelBase {
             _mainVm.SwitchToConfiguration();
             return;
         }
-        _shuffledIndices = Enumerable.Range(0, ActivePack.Questions.Count)
+        shuffles = Enumerable.Range(0, ActivePack.Questions.Count)
                                     .OrderBy(_ => _rnd.Next())
                                     .ToArray();
         _currentIndex = 0;
@@ -65,13 +86,16 @@ public class PlayerViewModel : ViewModelBase {
     }
 
     private void ShowCurrentQuestion() {
-        if(_shuffledIndices == null || _currentIndex >= _shuffledIndices.Length) {
+        if(shuffles == null || _currentIndex >= shuffles.Length) {
+            StopTimer();
             MessageBox.Show("Quiz Complete! Well done!");
             _mainVm.SwitchToConfiguration();
             return;
         }
-        int idx = _shuffledIndices[_currentIndex];
+        int idx = shuffles[_currentIndex];
         CurrentQuestion = ActivePack.Questions[idx];
+        _initialSeconds = ActivePack?.TimeLimitInSeconds ?? 30;
+        StartTimer(_initialSeconds);
     }
 
     private void LoadAnswers() {
@@ -82,6 +106,7 @@ public class PlayerViewModel : ViewModelBase {
             .OrderBy(_ => _rnd.Next())
             .ToList();
         var selectCmd = new DelegateCommand(answerObj => {
+            StopTimer();
             var clickedText = (string)answerObj!;
             bool isCorrect = clickedText == CurrentQuestion.CorrectAnswer;
             foreach(var opt in Answers) opt.Background = Brushes.LightGray;
@@ -90,7 +115,38 @@ public class PlayerViewModel : ViewModelBase {
             _currentIndex++;
             ShowCurrentQuestion();
         });
+
         foreach(var text in options)
             Answers.Add(new AnswerOption(text, selectCmd));
+    }
+
+    private void StartTimer(int seconds) {
+        TimeRemaining = TimeSpan.FromSeconds(seconds);
+        _stopwatch.Restart();
+        if(!_timer.IsEnabled) _timer.Start();
+    }
+
+    private void StopTimer() {
+        if(_timer.IsEnabled) _timer.Stop();
+        _stopwatch.Stop();
+    }
+
+    private void Timer_Tick(object? sender, EventArgs e) {
+        var elapsed = _stopwatch.Elapsed;
+        var remaining = TimeSpan.FromSeconds(_initialSeconds) - elapsed;
+        if(remaining <= TimeSpan.Zero) {
+            TimeRemaining = TimeSpan.Zero;
+            StopTimer();
+            OnTimeExpired();
+            
+        } else {
+            TimeRemaining = remaining;
+        }
+    }
+
+    private void OnTimeExpired() {
+        MessageBox.Show("Time is up you suck", "You ran out of time!", MessageBoxButton.OK, MessageBoxImage.Information);
+        _currentIndex++;
+        ShowCurrentQuestion();
     }
 }
