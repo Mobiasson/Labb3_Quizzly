@@ -16,6 +16,7 @@ public class MainWindowViewModel : ViewModelBase {
     private object? _currentView;
     private Difficulty _selectedDifficulty = Difficulty.Medium;
     private CategoryItem _selectedCategory = new CategoryItem { id = 5 };
+    private int _selectedAmount = 10;
     private QuestionPackViewModel? _activePack;
     private Question? _currentQuestion;
     public IEnumerable<Difficulty> Difficulties => Enum.GetValues<Difficulty>();
@@ -81,7 +82,16 @@ public class MainWindowViewModel : ViewModelBase {
         CurrentView = new PlayerView { DataContext = playerVM };
     }
 
-
+    public int SelectedAmount {
+        get => _selectedAmount;
+        set {
+            int clamped = Math.Clamp(value, 1, 20);
+            if(_selectedAmount == clamped) return;
+            _selectedAmount = clamped;
+            RaisePropertyChanged(nameof(SelectedAmount));
+        }
+    }
+    public void SetSelectedAmount(int amount) => SelectedAmount = amount;
 
     public Difficulty CurrentDifficulty {
         get => _selectedDifficulty;
@@ -153,7 +163,8 @@ public class MainWindowViewModel : ViewModelBase {
         if(_selectedCategory == null) return;
         string diff = _selectedDifficulty.ToString().ToLower();
         int categoryId = _selectedCategory.id;
-        string url = $"https://opentdb.com/api.php?amount=10&category={categoryId}&type=multiple&difficulty={diff}";
+        int amount = _selectedAmount;
+        string url = $"https://opentdb.com/api.php?amount={amount}&category={categoryId}&type=multiple&difficulty={diff}";
         string json = await http.GetStringAsync(url);
         var result = JsonConvert.DeserializeObject<ReadJson>(json);
         if(result?.results == null || result.results.Count == 0) return;

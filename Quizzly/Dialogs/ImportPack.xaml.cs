@@ -22,6 +22,8 @@ public partial class ImportPack : Window {
                 _mainVm.Packs.Add(vm);
                 _mainVm.ActivePack = vm;
             }
+            _mainVm.SetSelectedAmount((int)questionValue.Value);
+            _mainVm.ActivePack!.TimeLimitInSeconds = (int)timerValue.Value;
             _mainVm.ActivePack!.Difficulty = _mainVm.CurrentDifficulty;
             await _mainVm.GetQuestionsFromDatabase();
             MessageBox.Show($"Succesfully imported category");
