@@ -1,7 +1,10 @@
 ﻿using Quizzly.Command;
 using Quizzly.Models;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -101,17 +104,22 @@ public class PlayerViewModel : ViewModelBase {
     private void LoadAnswers() {
         Answers.Clear();
         if(CurrentQuestion == null) return;
+
         var options = new[] { CurrentQuestion.CorrectAnswer }
             .Concat(CurrentQuestion.IncorrectAnswers)
             .OrderBy(_ => _rnd.Next())
             .ToList();
-        var selectCmd = new DelegateCommand(answerObj => {
+        var selectCmd = new DelegateCommand(async answerObj => {
             StopTimer();
+
             var clickedText = (string)answerObj!;
             bool isCorrect = clickedText == CurrentQuestion.CorrectAnswer;
             foreach(var opt in Answers) opt.Background = Brushes.LightGray;
-            var clicked = Answers.First(o => o.Text == clickedText);
-            clicked.Background = isCorrect ? Brushes.Green : Brushes.IndianRed;
+            var clicked = Answers.FirstOrDefault(o => o.Text == clickedText);
+            if(clicked != null) {
+                clicked.Background = isCorrect ? Brushes.Green : Brushes.IndianRed;
+            }
+            await Task.Delay(900);
             _currentIndex++;
             ShowCurrentQuestion();
         });
@@ -138,7 +146,7 @@ public class PlayerViewModel : ViewModelBase {
             TimeRemaining = TimeSpan.Zero;
             StopTimer();
             OnTimeExpired();
-            
+
         } else {
             TimeRemaining = remaining;
         }
