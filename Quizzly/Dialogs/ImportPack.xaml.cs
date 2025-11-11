@@ -26,7 +26,7 @@ public partial class ImportPack : Window {
             _mainVm.ActivePack!.TimeLimitInSeconds = (int)timerValue.Value;
             _mainVm.ActivePack!.Difficulty = _mainVm.CurrentDifficulty;
             await _mainVm.GetQuestionsFromDatabase();
-            MessageBox.Show($"Succesfully imported category");
+            MessageBox.Show($"Succesfully imported ");
             DialogResult = true;
         }
         catch(Exception ex) {
