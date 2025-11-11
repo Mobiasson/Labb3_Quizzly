@@ -31,4 +31,8 @@ public partial class ImportPack : Window {
             MessageBox.Show("Something went wrong, you are a bit too fast. Try again" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
+
+    private void Button_Click(object sender, RoutedEventArgs e) {
+        Close();
+    }
 }
