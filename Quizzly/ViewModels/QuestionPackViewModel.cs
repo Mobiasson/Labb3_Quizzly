@@ -22,6 +22,13 @@ public class QuestionPackViewModel : ViewModelBase {
         Questions.CollectionChanged += Questions_CollectionChanged;
     }
 
+    public int CategoryId {
+        get => _model.CategoryId;
+        set {
+            _model.CategoryId = value;
+            RaisePropertyChanged();
+        }
+    }
 
     public string Name {
         get => _model.Name;
@@ -53,7 +60,6 @@ public class QuestionPackViewModel : ViewModelBase {
             mainWindowViewModel.RemoveQuestionCommand.RaiseCanExecuteChanged();
         }
     }
-
     private void Questions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
         switch(e.Action) {
             case NotifyCollectionChangedAction.Add when e.NewItems != null:

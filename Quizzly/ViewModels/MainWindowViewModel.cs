@@ -12,11 +12,12 @@ using System.Windows;
 namespace Quizzly.ViewModels;
 public class MainWindowViewModel : ViewModelBase {
     private readonly HttpClient http = new();
-    private Difficulty _selectedDifficulty = Difficulty.Medium;
-    private QuestionPackViewModel? _activePack;
-    private object? _currentView;
-    private Question? _currentQuestion;
     private readonly string _filePath;
+    private object? _currentView;
+    private Difficulty _selectedDifficulty = Difficulty.Medium;
+    private CategoryItem _selectedCategory = new CategoryItem { id = 5 };
+    private QuestionPackViewModel? _activePack;
+    private Question? _currentQuestion;
     public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
     public ObservableCollection<CategoryItem> Categories { get; } = new();
     public ConfigurationViewModel ConfigVM { get; }
@@ -57,6 +58,7 @@ public class MainWindowViewModel : ViewModelBase {
             ActivePack = Packs[0];
         }
         PickRandomQuestion();
+        GetQuestionsFromDatabase();
     }
 
     private QuestionPackViewModel CreatePackVm(QuestionPack model) {
@@ -76,6 +78,14 @@ public class MainWindowViewModel : ViewModelBase {
         var playerVM = new PlayerViewModel(this);
         playerVM.StartQuiz();
         CurrentView = new PlayerView { DataContext = playerVM };
+    }
+
+    public CategoryItem? CurrentCategory {
+        get => _selectedCategory;
+        set {
+            _selectedCategory = value;
+            RaisePropertyChanged(nameof(CurrentCategory));
+        }
     }
 
     public Question? CurrentQuestion {
@@ -128,13 +138,16 @@ public class MainWindowViewModel : ViewModelBase {
 
     public async Task GetQuestionsFromDatabase() {
         if(ActivePack == null) return;
+        if(_selectedCategory == null) return;
         string diff = _selectedDifficulty.ToString().ToLower();
-        string url = $"https://opentdb.com/api.php?amount=10&type=multiple&difficulty={diff}";
+        int categoryId = _selectedCategory.id;
+        string url = $"https://opentdb.com/api.php?amount=10&category={categoryId}&type=multiple&difficulty={diff}";
         string json = await http.GetStringAsync(url);
         var result = JsonConvert.DeserializeObject<ReadJson>(json);
         if(result?.results == null || result.results.Count == 0) return;
-        string category = HtmlDecode(result.results[0].category);
-        ActivePack.Category = category;
+        string categoryName = HtmlDecode(result.results[0].category);
+        ActivePack.Category = categoryName;
+        ActivePack.CategoryId = categoryId;
         ActivePack.Questions.Clear();
         foreach(var q in result.results) {
             ActivePack.Questions.Add(new Question(
@@ -145,6 +158,7 @@ public class MainWindowViewModel : ViewModelBase {
                 incorrectAnswer3: HtmlDecode(q.incorrect_answers[2])
             ));
         }
+        SavePacks();
     }
 
     public async Task LoadCategoriesAsync() {
