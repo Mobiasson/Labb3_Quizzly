@@ -16,7 +16,14 @@ public partial class MenuView : UserControl {
     }
 
     private void MenuItem_Click(object sender, RoutedEventArgs e) {
-        var importPack = new ImportPack();
-        importPack.Show();
+        if(Application.Current?.MainWindow?.DataContext is MainWindowViewModel mainVm) {
+            var importPack = new ImportPack(mainVm) {
+                Owner = Window.GetWindow(this)
+            };
+            importPack.ShowDialog();
+        } else {
+            var importPack = new ImportPack(new MainWindowViewModel());
+            importPack.ShowDialog();
+        }
     }
 }

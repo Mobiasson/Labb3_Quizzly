@@ -18,6 +18,7 @@ public class MainWindowViewModel : ViewModelBase {
     private CategoryItem _selectedCategory = new CategoryItem { id = 5 };
     private QuestionPackViewModel? _activePack;
     private Question? _currentQuestion;
+    public IEnumerable<Difficulty> Difficulties => Enum.GetValues<Difficulty>();
     public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
     public ObservableCollection<CategoryItem> Categories { get; } = new();
     public ConfigurationViewModel ConfigVM { get; }
@@ -61,7 +62,7 @@ public class MainWindowViewModel : ViewModelBase {
         GetQuestionsFromDatabase();
     }
 
-    private QuestionPackViewModel CreatePackVm(QuestionPack model) {
+    public QuestionPackViewModel CreatePackVm(QuestionPack model) {
         return new QuestionPackViewModel(this, model, RemovePackCommand);
     }
 
@@ -78,6 +79,17 @@ public class MainWindowViewModel : ViewModelBase {
         var playerVM = new PlayerViewModel(this);
         playerVM.StartQuiz();
         CurrentView = new PlayerView { DataContext = playerVM };
+    }
+
+
+
+    public Difficulty CurrentDifficulty {
+        get => _selectedDifficulty;
+        set {
+            if(_selectedDifficulty == value) return;
+            _selectedDifficulty = value;
+            RaisePropertyChanged(nameof(CurrentDifficulty));
+        }
     }
 
     public CategoryItem? CurrentCategory {

@@ -1,4 +1,4 @@
-﻿<Window x:Class="Quizzly.Dialogs.ImportPack" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:Quizzly.Dialogs" mc:Ignorable="d" Title="ImportPack" Height="250" Width="300">
+﻿<Window x:Class="Quizzly.Dialogs.ImportPack" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" Title="ImportPack" Height="250" Width="300">
 	<Grid Margin="15">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
@@ -8,14 +8,9 @@
 			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
 		<Label Grid.Row="0" Content="Difficulty" FontWeight="Bold" />
-		<ComboBox Grid.Row="1" HorizontalContentAlignment="Left" Margin="5" IsEditable="False">
-			<ComboBoxItem Content="Easy" />
-			<ComboBoxItem Content="Medium" />
-			<ComboBoxItem Content="Hard" />
-		</ComboBox>
+		<ComboBox Grid.Row="1" ItemsSource="{Binding Difficulties}" SelectedItem="{Binding CurrentDifficulty, Mode=TwoWay}" HorizontalContentAlignment="Left" Margin="5" IsEditable="False" />
 		<Label Grid.Row="2" Content="Category" FontWeight="Bold" />
-		<ComboBox Grid.Row="3" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" HorizontalContentAlignment="Left" DisplayMemberPath="name" Margin="5" IsEditable="False" />
-		<Button Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Padding="5" Content="Import" />
+		<ComboBox Grid.Row="3" ItemsSource="{Binding Categories}" SelectedItem="{Binding CurrentCategory, Mode=TwoWay}" HorizontalContentAlignment="Left" DisplayMemberPath="name" Margin="5" IsEditable="False" />
+		<Button Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Padding="5" Content="Import" Click="ImportButton_Click" />
 	</Grid>
 </Window>
- 
