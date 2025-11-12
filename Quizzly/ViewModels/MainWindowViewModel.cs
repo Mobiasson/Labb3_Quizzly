@@ -242,4 +242,5 @@ public class MainWindowViewModel : ViewModelBase {
     public void OnWindowClosing() => SavePacks();
     public void SetSelectedAmount(int amount) => SelectedAmount = amount;
     private static string HtmlDecode(string text) => WebUtility.HtmlDecode(text);
+
 }

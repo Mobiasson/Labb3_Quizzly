@@ -44,19 +44,27 @@
 					<RowDefinition Height="auto" />
 					<RowDefinition Height="auto" />
 					<RowDefinition Height="auto" />
+					<RowDefinition Height="auto" />
+					<RowDefinition Height="*" />
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
-				<UniformGrid Grid.Row="1" Rows="2" Columns="2" Margin="10">
+				<UniformGrid Grid.Row="1" Rows="2" Columns="2" Margin="10 10 10 0">
 					<TextBox x:Name="correct_textbox" Grid.Row="0" Grid.Column="0" Margin="5" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.CorrectAnswer, Mode=OneWay}" TextWrapping="Wrap" Background="LightGreen" />
 					<TextBox x:Name="incorrect1_textbox" Grid.Row="0" Grid.Column="1" Margin="5" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[0], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 					<TextBox x:Name="incorrect2_textbox" Grid.Row="1" Grid.Column=" 0" Margin="5" BorderBrush=" Black" BorderThickness=" 1" HorizontalAlignment=" Stretch" VerticalAlignment=" Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[1], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 					<TextBox x:Name="incorrect3_textbox" Grid.Row="1" Grid.Column="1" Margin="5" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
 				</UniformGrid>
-					<Button x:Name="AddQuestion_button" Grid.Row="3" Grid.Column="0" Width="auto" Height="auto" Margin="15" Padding="5" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Hidden" Content="Add Question" Click="AddQuestion_button_Click" />
-					<Button Content="PLAY" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15" Padding="12,6" FontSize="16" FontWeight="Bold" Command="{Binding DataContext.PlayCommand, 
+				<Button x:Name="AddQuestion_button" Grid.Row="3" Grid.Column="0" Width="auto" Height="auto" Margin="10" Padding="5" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Hidden" Content="Add Question" Click="AddQuestion_button_Click" />
+				<Button Content="PLAY" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15" Padding="12,6" FontSize="16" FontWeight="Bold" Command="{Binding DataContext.PlayCommand, 
                          RelativeSource={RelativeSource AncestorType=Window}}" />
+				<StackPanel Grid.Row="4" Margin="15 5 15 15">
+					<Label Content="Configurations:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" FontWeight="Bold" />
+					<TextBlock Width="auto" Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ActivePack.TimeLimitInSeconds, StringFormat='Time set to: {0} seconds'}" />
+					<TextBlock Width="auto" Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding QuestionCount, StringFormat='Questions: {0}'}" />
+					<TextBlock Width="auto" Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ActivePack.Difficulty, StringFormat='Difficulty: {0}'}" />
+				</StackPanel>
 			</Grid>
 		</Grid>
 	</Grid>
