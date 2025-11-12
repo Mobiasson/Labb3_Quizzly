@@ -91,6 +91,8 @@ public class MainWindowViewModel : ViewModelBase {
             RaisePropertyChanged(nameof(SelectedAmount));
         }
     }
+
+
     public void SetSelectedAmount(int amount) => SelectedAmount = amount;
 
     public Difficulty CurrentDifficulty {

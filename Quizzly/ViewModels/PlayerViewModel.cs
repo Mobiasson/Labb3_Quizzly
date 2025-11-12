@@ -25,7 +25,6 @@ public class AnswerOption : ViewModelBase {
             }
         }
     }
-
     public AnswerOption(string text, DelegateCommand selectCommand) {
         Text = text;
         SelectCommand = selectCommand;
@@ -41,10 +40,12 @@ public class PlayerViewModel : ViewModelBase {
     private int _currentIndex = -1;
     private int _initialSeconds = 30;
     private TimeSpan _timeRemaining = TimeSpan.Zero;
-    public ObservableCollection<AnswerOption> Answers { get; } = new();
-    public QuestionPackViewModel ActivePack => _mainVm.ActivePack!;
-    public DelegateCommand BackCommand { get; }
     private Question? _currentQuestion;
+    public ObservableCollection<AnswerOption> Answers { get; } = new();
+    public DelegateCommand BackCommand { get; }
+    public string TimeRemainingDisplay => TimeRemaining.ToString(@"mm\:ss");
+
+    public QuestionPackViewModel ActivePack => _mainVm.ActivePack!;
 
     public Question? CurrentQuestion {
         get => _currentQuestion;
@@ -52,6 +53,9 @@ public class PlayerViewModel : ViewModelBase {
             _currentQuestion = value;
             RaisePropertyChanged(nameof(CurrentQuestion));
             LoadAnswers();
+            RaisePropertyChanged(nameof(QuestionProgress));
+            RaisePropertyChanged(nameof(CurrentQuestionNumber));
+            RaisePropertyChanged(nameof(TotalQuestions));
         }
     }
 
@@ -65,7 +69,10 @@ public class PlayerViewModel : ViewModelBase {
             }
         }
     }
-    public string TimeRemainingDisplay => TimeRemaining.ToString(@"mm\:ss");
+
+    public int CurrentQuestionNumber => (_currentIndex >= 0 && shuffles != null && _currentIndex < shuffles.Length) ? _currentIndex + 1 : 0;
+    public int TotalQuestions => ActivePack?.Questions.Count ?? 0;
+    public string QuestionProgress => $"{CurrentQuestionNumber}/{TotalQuestions}";
 
     public PlayerViewModel(MainWindowViewModel mainVm) {
         _mainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
@@ -99,6 +106,9 @@ public class PlayerViewModel : ViewModelBase {
         CurrentQuestion = ActivePack.Questions[idx];
         _initialSeconds = ActivePack?.TimeLimitInSeconds ?? 30;
         StartTimer(_initialSeconds);
+        RaisePropertyChanged(nameof(QuestionProgress));
+        RaisePropertyChanged(nameof(CurrentQuestionNumber));
+        RaisePropertyChanged(nameof(TotalQuestions));
     }
 
     private void LoadAnswers() {
@@ -111,7 +121,6 @@ public class PlayerViewModel : ViewModelBase {
             .ToList();
         var selectCmd = new DelegateCommand(async answerObj => {
             StopTimer();
-
             var clickedText = (string)answerObj!;
             bool isCorrect = clickedText == CurrentQuestion.CorrectAnswer;
             foreach(var opt in Answers) opt.Background = Brushes.LightGray;
@@ -123,7 +132,6 @@ public class PlayerViewModel : ViewModelBase {
             _currentIndex++;
             ShowCurrentQuestion();
         });
-
         foreach(var text in options)
             Answers.Add(new AnswerOption(text, selectCmd));
     }
@@ -153,7 +161,7 @@ public class PlayerViewModel : ViewModelBase {
     }
 
     private void OnTimeExpired() {
-        MessageBox.Show("Time is up you suck", "You ran out of time!", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show("Time is up, can't you read?", "You ran out of time!", MessageBoxButton.OK, MessageBoxImage.Information);
         _currentIndex++;
         ShowCurrentQuestion();
     }
