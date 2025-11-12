@@ -220,10 +220,6 @@ public class MainWindowViewModel : ViewModelBase {
     public void SwitchToEnd() => CurrentView = EndView;
     public void OnWindowClosing() => SavePacks();
     public void SetSelectedAmount(int amount) => SelectedAmount = amount;
-    public void Restart() {
-        LoadCategoriesAsync();
-        PlayerVM.StartQuiz();
-    }
 
     public async Task RestartAsync() {
         await LoadCategoriesAsync();
