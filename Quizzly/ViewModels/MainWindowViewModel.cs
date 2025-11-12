@@ -25,6 +25,8 @@ public class MainWindowViewModel : ViewModelBase {
     public ConfigurationViewModel ConfigVM { get; }
     public PlayerViewModel PlayerVM { get; }
     public MenuViewModel MenuVM { get; }
+    public EndViewModel EndVM { get; }
+    public EndView EndView { get; }
     public ConfigurationView ConfigView { get; }
     public PlayerView PlayerView { get; }
     public MenuView MenuViewInstance { get; }
@@ -46,6 +48,7 @@ public class MainWindowViewModel : ViewModelBase {
         MenuVM = new MenuViewModel(this);
         ConfigView = new ConfigurationView { DataContext = ConfigVM };
         PlayerView = new PlayerView { DataContext = PlayerVM };
+        EndView = new EndView { DataContext = EndVM };
         MenuViewInstance = new MenuView { DataContext = MenuVM };
         CurrentView = ConfigView;
         LoadPacks();
@@ -70,7 +73,7 @@ public class MainWindowViewModel : ViewModelBase {
     private async void ExecutePlay(object? param) {
         if(ActivePack == null) return;
         if(ActivePack.Questions.Count == 0) {
-            var result = MessageBox.Show("Load 10 questions from API?", "No Questions", MessageBoxButton.YesNo);
+            var result = MessageBox.Show("Load 10 questions from API?", "No Questions", MessageBoxButton.YesNo); //Remember to change to dynamic number
             if(result == MessageBoxResult.Yes) {
                 await GetQuestionsFromDatabase();
             } else {
@@ -91,9 +94,6 @@ public class MainWindowViewModel : ViewModelBase {
             RaisePropertyChanged(nameof(SelectedAmount));
         }
     }
-
-
-    public void SetSelectedAmount(int amount) => SelectedAmount = amount;
 
     public Difficulty CurrentDifficulty {
         get => _selectedDifficulty;
@@ -217,6 +217,25 @@ public class MainWindowViewModel : ViewModelBase {
     private bool CanRemoveQuestionExecute(object? param) => ActivePack?.SelectedQuestion != null;
     public void SwitchToPlayer() => CurrentView = PlayerView;
     public void SwitchToConfiguration() => CurrentView = ConfigView;
+    public void SwitchToEnd() => CurrentView = EndView;
     public void OnWindowClosing() => SavePacks();
+    public void SetSelectedAmount(int amount) => SelectedAmount = amount;
+    public void Restart() {
+        LoadCategoriesAsync();
+        PlayerVM.StartQuiz();
+    }
+
+    public async Task RestartAsync() {
+        await LoadCategoriesAsync();
+        if(ActivePack == null)
+            ActivePack = Packs.FirstOrDefault();
+        if(ActivePack == null || ActivePack.Questions.Count == 0) {
+            await GetQuestionsFromDatabase();
+        }
+        var playerVM = new PlayerViewModel(this);
+        playerVM.StartQuiz();
+        CurrentView = new PlayerView { DataContext = playerVM };
+    }
+
     private static string HtmlDecode(string text) => WebUtility.HtmlDecode(text);
 }

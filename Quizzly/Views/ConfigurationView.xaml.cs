@@ -46,7 +46,7 @@ public partial class ConfigurationView : UserControl {
 
     private void Play_button_Click(object sender, RoutedEventArgs e) {
         var mainVm = (MainWindowViewModel)Application.Current.MainWindow.DataContext;
-        mainVm.SwitchToPlayer();
+        mainVm.Restart();
     }
 
 }

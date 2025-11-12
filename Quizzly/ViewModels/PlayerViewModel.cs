@@ -99,7 +99,7 @@ public class PlayerViewModel : ViewModelBase {
         if(shuffles == null || _currentIndex >= shuffles.Length) {
             StopTimer();
             MessageBox.Show("Quiz Complete! Well done!");
-            _mainVm.SwitchToConfiguration();
+            _mainVm.SwitchToEnd();
             return;
         }
         int idx = shuffles[_currentIndex];
