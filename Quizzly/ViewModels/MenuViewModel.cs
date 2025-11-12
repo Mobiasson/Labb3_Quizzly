@@ -9,5 +9,6 @@ namespace Quizzly.ViewModels {
         }
 
         public DelegateCommand RemoveQuestionCommand => _mainVm.RemoveQuestionCommand;
+        public DelegateCommand AddQuestionCommand => _mainVm.AddQuestionCommand;
     }
 }

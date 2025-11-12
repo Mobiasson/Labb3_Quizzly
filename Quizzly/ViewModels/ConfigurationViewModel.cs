@@ -5,12 +5,12 @@ using System.Collections.ObjectModel;
 namespace Quizzly.ViewModels;
 public class ConfigurationViewModel : ViewModelBase {
     private readonly MainWindowViewModel? mainWindowViewModel;
-    private readonly MainWindowViewModel _mainVm;
+    //private readonly MainWindowViewModel _mainVm;
     public DelegateCommand LoadTenQuestionsCommand { get; }
 
     public ConfigurationViewModel(MainWindowViewModel? mainWindowViewModel) {
         this.mainWindowViewModel = mainWindowViewModel;
-        _mainVm = mainWindowViewModel ?? throw new ArgumentNullException(nameof(mainWindowViewModel));
+        var _mainVm = mainWindowViewModel ?? throw new ArgumentNullException(nameof(mainWindowViewModel));
         LoadTenQuestionsCommand = new DelegateCommand(_ => mainWindowViewModel?.GetQuestionsFromDatabase());
     }
 
@@ -30,4 +30,6 @@ public class ConfigurationViewModel : ViewModelBase {
     }
 
     public DelegateCommand? RemoveQuestionCommand => mainWindowViewModel?.RemoveQuestionCommand;
+
+    public DelegateCommand? AddQuestionCommand => mainWindowViewModel?.AddQuestionCommand;
 }

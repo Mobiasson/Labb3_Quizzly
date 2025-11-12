@@ -33,6 +33,7 @@ public class MainWindowViewModel : ViewModelBase {
     public DelegateCommand RemoveQuestionCommand { get; }
     public DelegateCommand RemovePackCommand { get; }
     public DelegateCommand PlayCommand { get; }
+    public DelegateCommand AddQuestionCommand { get; }
 
     public MainWindowViewModel() {
         var folder = Path.Combine(
@@ -43,6 +44,7 @@ public class MainWindowViewModel : ViewModelBase {
         RemoveQuestionCommand = new DelegateCommand(RemoveQuestionExecute, CanRemoveQuestionExecute);
         RemovePackCommand = new DelegateCommand(RemovePackExecute, CanRemovePackExecute);
         PlayCommand = new DelegateCommand(ExecutePlay, CanPlay);
+        AddQuestionCommand = new DelegateCommand(AddQuestion, CanAddQuestion);
         ConfigVM = new ConfigurationViewModel(this);
         PlayerVM = new PlayerViewModel(this);
         MenuVM = new MenuViewModel(this);
@@ -65,6 +67,7 @@ public class MainWindowViewModel : ViewModelBase {
         PickRandomQuestion();
         _ = GetQuestionsFromDatabase();
     }
+
 
     public QuestionPackViewModel CreatePackVm(QuestionPack model) {
         return new QuestionPackViewModel(this, model, RemovePackCommand);
@@ -144,6 +147,11 @@ public class MainWindowViewModel : ViewModelBase {
             ));
         }
         SavePacks();
+    }
+
+    private void AddQuestion(object? obj) {
+        ConfigView.PrepareAddQuestion();
+        CurrentView = ConfigView;
     }
 
     private async void ExecutePlay(object? param) {
@@ -227,6 +235,7 @@ public class MainWindowViewModel : ViewModelBase {
     private bool CanRemovePackExecute(object? param) => param is QuestionPackViewModel;
     private bool CanPlay(object? param) => ActivePack?.Questions.Count > 0;
     private bool CanRemoveQuestionExecute(object? param) => ActivePack?.SelectedQuestion != null;
+    private bool CanAddQuestion(object? arg) => ActivePack?.Questions.Count <= 20;
     public void SwitchToPlayer() => CurrentView = PlayerView;
     public void SwitchToConfiguration() => CurrentView = ConfigView;
     public void SwitchToEnd() => CurrentView = EndView;

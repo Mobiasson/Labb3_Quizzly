@@ -46,8 +46,12 @@ public partial class ConfigurationView : UserControl {
 
     private void Play_button_Click(object sender, RoutedEventArgs e) {
         var mainVm = (MainWindowViewModel)Application.Current.MainWindow.DataContext;
-       _ =  mainVm.RestartAsync();
+        mainVm.SwitchToPlayer();
     }
-
+    public void PrepareAddQuestion() {
+        ClearTextBoxes();
+        AddQuestion_button.Visibility = Visibility.Visible;
+        question_textbox.Focus();
+    }
 }
 

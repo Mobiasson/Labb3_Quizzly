@@ -19,7 +19,7 @@
 			<DockPanel HorizontalAlignment="Stretch" LastChildFill="False" Margin="6 5 5 0">
 				<TextBlock Text="{Binding ActivePack.Category}" Width="250" Margin="10 0 0 0" FontSize="15" DockPanel.Dock="Left" VerticalAlignment="Center" TextWrapping="Wrap" />
 				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 10 0">
-					<Button Content="Add" Margin="5 5 5 0" Padding="5" Click="Button_Click" />
+					<Button Content="Add" Margin="5 5 5 0" Padding="5" Command="{Binding AddQuestionCommand}" />
 					<Button Content="Remove" Margin="0 5 0 0" Padding="5" Command="{Binding RemoveQuestionCommand}" />
 				</StackPanel>
 			</DockPanel>
