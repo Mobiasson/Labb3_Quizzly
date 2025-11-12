@@ -34,6 +34,7 @@ public class MainWindowViewModel : ViewModelBase {
     public DelegateCommand RemovePackCommand { get; }
     public DelegateCommand PlayCommand { get; }
     public DelegateCommand AddQuestionCommand { get; }
+    public DelegateCommand ChangePackNameCommand { get; }
 
     public MainWindowViewModel() {
         var folder = Path.Combine(
@@ -45,6 +46,7 @@ public class MainWindowViewModel : ViewModelBase {
         RemovePackCommand = new DelegateCommand(RemovePackExecute, CanRemovePackExecute);
         PlayCommand = new DelegateCommand(ExecutePlay, CanPlay);
         AddQuestionCommand = new DelegateCommand(AddQuestion, CanAddQuestion);
+        ChangePackNameCommand = new DelegateCommand(ChangePackName, CanChangePackName);
         ConfigVM = new ConfigurationViewModel(this);
         PlayerVM = new PlayerViewModel(this);
         MenuVM = new MenuViewModel(this);
@@ -67,7 +69,6 @@ public class MainWindowViewModel : ViewModelBase {
         PickRandomQuestion();
         _ = GetQuestionsFromDatabase();
     }
-
 
     public QuestionPackViewModel CreatePackVm(QuestionPack model) {
         return new QuestionPackViewModel(this, model, RemovePackCommand);
@@ -134,8 +135,12 @@ public class MainWindowViewModel : ViewModelBase {
         var result = JsonConvert.DeserializeObject<ReadJson>(json);
         if(result?.results == null || result.results.Count == 0) return;
         string categoryName = HtmlDecode(result.results[0].category);
+
+        // Overwrite pack name and category so the UI always shows the imported category
+        ActivePack.Name = categoryName;
         ActivePack.Category = categoryName;
         ActivePack.CategoryId = categoryId;
+
         ActivePack.Questions.Clear();
         foreach(var q in result.results) {
             ActivePack.Questions.Add(new Question(
@@ -207,8 +212,8 @@ public class MainWindowViewModel : ViewModelBase {
     }
     public void PickRandomQuestion() {
         if(ActivePack?.Questions.Count > 0) {
-            var rnd = new Random();
-            int index = rnd.Next(ActivePack.Questions.Count);
+                    var rnd = new Random();
+                    int index = rnd.Next(ActivePack.Questions.Count);
             CurrentQuestion = ActivePack.Questions[index];
         } else {
             CurrentQuestion = null;
@@ -227,6 +232,12 @@ public class MainWindowViewModel : ViewModelBase {
             ActivePack = Packs.FirstOrDefault();
         }
     }
+    private void ChangePackName(object? param) {
+        var newName = param as string;
+        if(string.IsNullOrWhiteSpace(newName) || ActivePack == null) return;
+        ActivePack.Name = newName.Trim();
+        SavePacks();
+    }
 
     public void SwitchToEnd(int correctAnswers, int totalQuestions) {
         CurrentView = new EndView { DataContext = new EndViewModel(this, correctAnswers, totalQuestions) };
@@ -236,6 +247,7 @@ public class MainWindowViewModel : ViewModelBase {
     private bool CanPlay(object? param) => ActivePack?.Questions.Count > 0;
     private bool CanRemoveQuestionExecute(object? param) => ActivePack?.SelectedQuestion != null;
     private bool CanAddQuestion(object? arg) => ActivePack?.Questions.Count <= 20;
+    private bool CanChangePackName(object? arg) => ActivePack != null;
     public void SwitchToPlayer() => CurrentView = PlayerView;
     public void SwitchToConfiguration() => CurrentView = ConfigView;
     public void SwitchToEnd() => CurrentView = EndView;

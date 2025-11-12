@@ -1,6 +1,5 @@
 ﻿using Quizzly.Dialogs;
 using Quizzly.ViewModels;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -36,6 +35,18 @@ public partial class MenuView : UserControl {
         } else {
             var packOptions = new PackOptionsDialog(new MainWindowViewModel());
             packOptions.ShowDialog();
+        }
+    }
+
+    private void packName_button_Click(object sender, RoutedEventArgs e) {
+        if(Application.Current?.MainWindow?.DataContext is MainWindowViewModel mainVm) {
+            var setPackName = new SetPackName(mainVm) {
+                Owner = Window.GetWindow(this)
+            };
+            setPackName.ShowDialog();
+        } else {
+            var setPackName = new SetPackName(new MainWindowViewModel());
+            setPackName.ShowDialog();
         }
     }
 }
