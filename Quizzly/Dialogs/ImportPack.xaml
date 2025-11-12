@@ -9,7 +9,7 @@
 			<Label Content="Difficulty" FontWeight="Bold" />
 			<ComboBox ItemsSource="{Binding Difficulties}" SelectedItem="{Binding CurrentDifficulty, Mode=TwoWay}" IsEditable="False" />
 			<Label Content="Category" FontWeight="Bold" />
-			<ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding CurrentCategory, Mode=TwoWay}" DisplayMemberPath="name" IsEditable="False"/>
+			<ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding CurrentCategory, Mode=TwoWay}" DisplayMemberPath="name" IsEditable="False" />
 			<DockPanel Margin="5">
 				<Label Content="TimerLimit" FontWeight="Bold" />
 				<TextBox HorizontalAlignment="Right" Text="{Binding ElementName=timerValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" Margin="5" Width="20" />

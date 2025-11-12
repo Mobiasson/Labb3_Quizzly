@@ -12,7 +12,7 @@
 			<MenuItem Header="Add Question" Command="{Binding DataContext.AddQuestionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 			<MenuItem Header="Remove Question" InputGestureText="Ctrl+R" Command="{Binding DataContext.RemoveQuestionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 			<MenuItem Header="Set PackName" />
-			<MenuItem Header="Pack Options" />
+			<MenuItem x:Name="pack_button" Header="Pack Options" Click="pack_button_Click"/>
 		</MenuItem>
 	</Menu>
 </UserControl>

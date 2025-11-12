@@ -27,4 +27,15 @@ public partial class MenuView : UserControl {
         }
     }
 
+    private void pack_button_Click(object sender, RoutedEventArgs e) {
+        if(Application.Current?.MainWindow?.DataContext is MainWindowViewModel mainVm) {
+            var packOptions = new PackOptionsDialog(mainVm) {
+                Owner = Window.GetWindow(this)
+            };
+            packOptions.ShowDialog();
+        } else {
+            var packOptions = new PackOptionsDialog(new MainWindowViewModel());
+            packOptions.ShowDialog();
+        }
+    }
 }

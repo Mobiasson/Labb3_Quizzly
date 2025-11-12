@@ -1,24 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Quizzly.ViewModels;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-namespace Quizzly.Dialogs {
-    /// <summary>
-    /// Interaction logic for PackOptionsDialog.xaml
-    /// </summary>
-    public partial class PackOptionsDialog : Window {
-        public PackOptionsDialog() {
-            InitializeComponent();
+namespace Quizzly.Dialogs;
+public partial class PackOptionsDialog : Window {
+    private readonly MainWindowViewModel _mainVm;
+    public PackOptionsDialog(MainWindowViewModel mainVm) {
+        InitializeComponent();
+        _mainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
+        DataContext = _mainVm;
+    }
+
+    private void cancel_button_Click(object sender, RoutedEventArgs e) {
+        Close();
+    }
+
+    private void confirm_button_Click(object sender, RoutedEventArgs e) {
+        try {
+            _mainVm.ActivePack!.TimeLimitInSeconds = (int)timerValue.Value;
+            _mainVm.ActivePack!.Difficulty = _mainVm.CurrentDifficulty;
+            DialogResult = true;
+            MessageBox.Show("Options changed");
+        }
+        catch(Exception ex) {
+            MessageBox.Show("Something went wrong, you are a bit too fast. Try again" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
