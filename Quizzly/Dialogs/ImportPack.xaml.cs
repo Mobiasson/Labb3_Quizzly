@@ -1,6 +1,4 @@
-﻿using Quizzly.Models;
-using Quizzly.ViewModels;
-using System;
+﻿using Quizzly.ViewModels;
 using System.Windows;
 
 namespace Quizzly.Dialogs;

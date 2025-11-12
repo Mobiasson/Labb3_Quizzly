@@ -1,10 +1,7 @@
 ﻿using Quizzly.Command;
 using Quizzly.Models;
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -41,6 +38,8 @@ public class PlayerViewModel : ViewModelBase {
     private int _initialSeconds = 30;
     private TimeSpan _timeRemaining = TimeSpan.Zero;
     private Question? _currentQuestion;
+    private int _correctAnswers;
+
     public ObservableCollection<AnswerOption> Answers { get; } = new();
     public DelegateCommand BackCommand { get; }
     public string TimeRemainingDisplay => TimeRemaining.ToString(@"mm\:ss");
@@ -88,6 +87,7 @@ public class PlayerViewModel : ViewModelBase {
             _mainVm.SwitchToConfiguration();
             return;
         }
+        _correctAnswers = 0;
         shuffles = Enumerable.Range(0, ActivePack.Questions.Count)
                                     .OrderBy(_ => _rnd.Next())
                                     .ToArray();
@@ -98,8 +98,8 @@ public class PlayerViewModel : ViewModelBase {
     private void ShowCurrentQuestion() {
         if(shuffles == null || _currentIndex >= shuffles.Length) {
             StopTimer();
-            MessageBox.Show("Quiz Complete! Well done!");
-            _mainVm.SwitchToEnd();
+            int total = shuffles?.Length ?? ActivePack.Questions.Count;
+            _mainVm.SwitchToEnd(_correctAnswers, total);
             return;
         }
         int idx = shuffles[_currentIndex];
@@ -123,6 +123,7 @@ public class PlayerViewModel : ViewModelBase {
             StopTimer();
             var clickedText = (string)answerObj!;
             bool isCorrect = clickedText == CurrentQuestion.CorrectAnswer;
+            if(isCorrect) _correctAnswers++;
             foreach(var opt in Answers) opt.Background = Brushes.LightGray;
             var clicked = Answers.FirstOrDefault(o => o.Text == clickedText);
             if(clicked != null) {

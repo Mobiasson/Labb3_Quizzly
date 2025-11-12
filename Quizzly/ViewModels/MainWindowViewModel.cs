@@ -63,26 +63,11 @@ public class MainWindowViewModel : ViewModelBase {
             ActivePack = Packs[0];
         }
         PickRandomQuestion();
-        GetQuestionsFromDatabase();
+        _ = GetQuestionsFromDatabase();
     }
 
     public QuestionPackViewModel CreatePackVm(QuestionPack model) {
         return new QuestionPackViewModel(this, model, RemovePackCommand);
-    }
-
-    private async void ExecutePlay(object? param) {
-        if(ActivePack == null) return;
-        if(ActivePack.Questions.Count == 0) {
-            var result = MessageBox.Show("Load 10 questions from API?", "No Questions", MessageBoxButton.YesNo); //Remember to change to dynamic number
-            if(result == MessageBoxResult.Yes) {
-                await GetQuestionsFromDatabase();
-            } else {
-                return;
-            }
-        }
-        var playerVM = new PlayerViewModel(this);
-        playerVM.StartQuiz();
-        CurrentView = new PlayerView { DataContext = playerVM };
     }
 
     public int SelectedAmount {
@@ -135,31 +120,6 @@ public class MainWindowViewModel : ViewModelBase {
         }
     }
 
-    public void PickRandomQuestion() {
-        if(ActivePack?.Questions.Count > 0) {
-            var rnd = new Random();
-            int index = rnd.Next(ActivePack.Questions.Count);
-            CurrentQuestion = ActivePack.Questions[index];
-        } else {
-            CurrentQuestion = null;
-        }
-    }
-
-    private void RemoveQuestionExecute(object? param) {
-        if(ActivePack?.SelectedQuestion != null) {
-            ActivePack.Questions.Remove(ActivePack.SelectedQuestion);
-            ActivePack.SelectedQuestion = null;
-            RemoveQuestionCommand.RaiseCanExecuteChanged();
-        }
-    }
-
-    private void RemovePackExecute(object? param) {
-        if(param is QuestionPackViewModel packVm && Packs.Contains(packVm)) {
-            Packs.Remove(packVm);
-            ActivePack = Packs.FirstOrDefault();
-        }
-    }
-
     public async Task GetQuestionsFromDatabase() {
         if(ActivePack == null) return;
         if(_selectedCategory == null) return;
@@ -184,6 +144,32 @@ public class MainWindowViewModel : ViewModelBase {
             ));
         }
         SavePacks();
+    }
+
+    private async void ExecutePlay(object? param) {
+        if(ActivePack == null) return;
+        if(ActivePack.Questions.Count == 0) {
+            var result = MessageBox.Show("Load 10 questions from API?", "No Questions", MessageBoxButton.YesNo); //Remember to change to dynamic number
+            if(result == MessageBoxResult.Yes) {
+                await GetQuestionsFromDatabase();
+            } else {
+                return;
+            }
+        }
+        var playerVM = new PlayerViewModel(this);
+        playerVM.StartQuiz();
+        CurrentView = new PlayerView { DataContext = playerVM };
+    }
+    public async Task RestartAsync() {
+        await LoadCategoriesAsync();
+        if(ActivePack == null)
+            ActivePack = Packs.FirstOrDefault();
+        if(ActivePack == null || ActivePack.Questions.Count == 0) {
+            await GetQuestionsFromDatabase();
+        }
+        var playerVM = new PlayerViewModel(this);
+        playerVM.StartQuiz();
+        CurrentView = new PlayerView { DataContext = playerVM };
     }
 
     public async Task LoadCategoriesAsync() {
@@ -211,6 +197,32 @@ public class MainWindowViewModel : ViewModelBase {
             Packs.Add(CreatePackVm(p));
         }
     }
+    public void PickRandomQuestion() {
+        if(ActivePack?.Questions.Count > 0) {
+            var rnd = new Random();
+            int index = rnd.Next(ActivePack.Questions.Count);
+            CurrentQuestion = ActivePack.Questions[index];
+        } else {
+            CurrentQuestion = null;
+        }
+    }
+    private void RemoveQuestionExecute(object? param) {
+        if(ActivePack?.SelectedQuestion != null) {
+            ActivePack.Questions.Remove(ActivePack.SelectedQuestion);
+            ActivePack.SelectedQuestion = null;
+            RemoveQuestionCommand.RaiseCanExecuteChanged();
+        }
+    }
+    private void RemovePackExecute(object? param) {
+        if(param is QuestionPackViewModel packVm && Packs.Contains(packVm)) {
+            Packs.Remove(packVm);
+            ActivePack = Packs.FirstOrDefault();
+        }
+    }
+
+    public void SwitchToEnd(int correctAnswers, int totalQuestions) {
+        CurrentView = new EndView { DataContext = new EndViewModel(this, correctAnswers, totalQuestions) };
+    }
 
     private bool CanRemovePackExecute(object? param) => param is QuestionPackViewModel;
     private bool CanPlay(object? param) => ActivePack?.Questions.Count > 0;
@@ -220,18 +232,5 @@ public class MainWindowViewModel : ViewModelBase {
     public void SwitchToEnd() => CurrentView = EndView;
     public void OnWindowClosing() => SavePacks();
     public void SetSelectedAmount(int amount) => SelectedAmount = amount;
-
-    public async Task RestartAsync() {
-        await LoadCategoriesAsync();
-        if(ActivePack == null)
-            ActivePack = Packs.FirstOrDefault();
-        if(ActivePack == null || ActivePack.Questions.Count == 0) {
-            await GetQuestionsFromDatabase();
-        }
-        var playerVM = new PlayerViewModel(this);
-        playerVM.StartQuiz();
-        CurrentView = new PlayerView { DataContext = playerVM };
-    }
-
     private static string HtmlDecode(string text) => WebUtility.HtmlDecode(text);
 }
