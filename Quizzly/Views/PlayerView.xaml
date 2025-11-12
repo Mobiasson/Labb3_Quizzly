@@ -37,7 +37,7 @@
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
 			<TextBlock Grid.Column="1" Text="{Binding TimeRemainingDisplay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="8" />
-			<Label Grid.Column="2" Content="{Binding QuestionProgress}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,10,0" />
+			<Label Grid.Column="2" Content="{Binding QuestionProgress}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,10,0" FontSize="20" FontWeight="Bold" />
 		</Grid>
 		<TextBlock Grid.Row="1" Text="{Binding CurrentQuestion.Query}" Width="auto" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Padding="5" Margin="20" />
 		<UniformGrid Grid.Row="2" Rows="2" Columns="2" Margin="10">
