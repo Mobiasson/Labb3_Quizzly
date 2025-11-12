@@ -135,12 +135,9 @@ public class MainWindowViewModel : ViewModelBase {
         var result = JsonConvert.DeserializeObject<ReadJson>(json);
         if(result?.results == null || result.results.Count == 0) return;
         string categoryName = HtmlDecode(result.results[0].category);
-
-        // Overwrite pack name and category so the UI always shows the imported category
         ActivePack.Name = categoryName;
         ActivePack.Category = categoryName;
         ActivePack.CategoryId = categoryId;
-
         ActivePack.Questions.Clear();
         foreach(var q in result.results) {
             ActivePack.Questions.Add(new Question(
@@ -212,8 +209,8 @@ public class MainWindowViewModel : ViewModelBase {
     }
     public void PickRandomQuestion() {
         if(ActivePack?.Questions.Count > 0) {
-                    var rnd = new Random();
-                    int index = rnd.Next(ActivePack.Questions.Count);
+            var rnd = new Random();
+            int index = rnd.Next(ActivePack.Questions.Count);
             CurrentQuestion = ActivePack.Questions[index];
         } else {
             CurrentQuestion = null;

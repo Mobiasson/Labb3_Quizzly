@@ -11,7 +11,7 @@ public class ConfigurationViewModel : ViewModelBase {
     public DelegateCommand LoadTenQuestionsCommand { get; }
 
     public ConfigurationViewModel(MainWindowViewModel? mainWindowViewModel) {
-        this.mainWindowViewModel = mainWindowViewModel ?? throw new ArgumentNullException(nameof(mainWindowViewModel));
+        this.mainWindowViewModel = mainWindowViewModel;
         LoadTenQuestionsCommand = new DelegateCommand(_ => this.mainWindowViewModel!.GetQuestionsFromDatabase());
         this.mainWindowViewModel.PropertyChanged += MainVm_PropertyChanged;
         if(this.mainWindowViewModel.ActivePack != null)

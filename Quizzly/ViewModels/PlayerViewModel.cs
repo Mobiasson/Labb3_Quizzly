@@ -39,12 +39,9 @@ public class PlayerViewModel : ViewModelBase {
     private TimeSpan _timeRemaining = TimeSpan.Zero;
     private Question? _currentQuestion;
     private int _correctAnswers;
-
     public ObservableCollection<AnswerOption> Answers { get; } = new();
     public DelegateCommand BackCommand { get; }
-    public string TimeRemainingDisplay => TimeRemaining.ToString(@"mm\:ss");
 
-    public QuestionPackViewModel ActivePack => _mainVm.ActivePack!;
 
     public Question? CurrentQuestion {
         get => _currentQuestion;
@@ -68,10 +65,6 @@ public class PlayerViewModel : ViewModelBase {
             }
         }
     }
-
-    public int CurrentQuestionNumber => (_currentIndex >= 0 && shuffles != null && _currentIndex < shuffles.Length) ? _currentIndex + 1 : 0;
-    public int TotalQuestions => ActivePack?.Questions.Count ?? 0;
-    public string QuestionProgress => $"{CurrentQuestionNumber}/{TotalQuestions}";
 
     public PlayerViewModel(MainWindowViewModel mainVm) {
         _mainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
@@ -166,4 +159,10 @@ public class PlayerViewModel : ViewModelBase {
         _currentIndex++;
         ShowCurrentQuestion();
     }
+
+    public int CurrentQuestionNumber => (_currentIndex >= 0 && shuffles != null && _currentIndex < shuffles.Length) ? _currentIndex + 1 : 0;
+    public int TotalQuestions => ActivePack?.Questions.Count ?? 0;
+    public QuestionPackViewModel ActivePack => _mainVm.ActivePack!;
+    public string TimeRemainingDisplay => TimeRemaining.ToString(@"mm\:ss");
+    public string QuestionProgress => $"{CurrentQuestionNumber}/{TotalQuestions}";
 }
