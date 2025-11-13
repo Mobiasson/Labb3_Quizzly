@@ -75,7 +75,6 @@ public class MainWindowViewModel : ViewModelBase {
 
     public void AddAndActivatePack(string name, Difficulty difficulty, int timeLimitInSeconds, CategoryItem? category, bool overwriteActive = false) {
         if(overwriteActive && ActivePack != null) {
-            // Update backing model (in-place) and the VM properties, and clear questions.
             var m = ActivePack.Model;
             m.Name = name;
             m.Difficulty = difficulty;

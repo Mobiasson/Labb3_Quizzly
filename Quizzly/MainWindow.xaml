@@ -5,7 +5,6 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 		<views:MenuView Grid.Row="0" DataContext="{Binding MenuVM}" />
-		<!-- Removed outer ScrollViewer so child views control their own scrolling -->
 		<ContentControl Grid.Row="1" Content="{Binding CurrentView}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 	</Grid>
 </Window>
