@@ -24,13 +24,9 @@ public partial class CreateNewPackDialog : Window {
             packNameTextBox.Focus();
             return;
         }
-
         var difficulty = _mainVm.CurrentDifficulty;
         int timeLimit = (int)timerValue.Value;
-
-        // Overwrite the active pack so the saved JSON does not keep the imported questions.
         _mainVm.AddAndActivatePack(name, difficulty, timeLimit, _mainVm.CurrentCategory, overwriteActive: true);
-
         DialogResult = true;
         Close();
     }
