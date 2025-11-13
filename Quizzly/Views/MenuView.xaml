@@ -49,5 +49,18 @@
 				</MenuItem.Icon>
 			</MenuItem>
 		</MenuItem>
+		<MenuItem Header="_View">
+			<MenuItem Header="Play" Command="{Binding DataContext.PlayCommand, RelativeSource={RelativeSource AncestorType=Window}}">
+				<MenuItem.Icon>
+					<fa:FontAwesome Icon="Play" />
+				</MenuItem.Icon>
+			</MenuItem>
+			<Separator />
+			<MenuItem Header="Fullscreen" Window.>
+				<MenuItem.Icon>
+					<fa:FontAwesome />
+				</MenuItem.Icon>
+			</MenuItem>
+		</MenuItem>
 	</Menu>
 </UserControl>
