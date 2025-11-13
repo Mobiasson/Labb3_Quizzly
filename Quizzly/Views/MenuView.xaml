@@ -56,9 +56,9 @@
 				</MenuItem.Icon>
 			</MenuItem>
 			<Separator />
-			<MenuItem Header="Fullscreen" Window.>
+			<MenuItem x:Name="fullscreenMenuItem" Header="Fullscreen" Command="{Binding FullscreenCommand}" InputGestureText="F11">
 				<MenuItem.Icon>
-					<fa:FontAwesome />
+					<fa:FontAwesome Icon="WindowMaximize" />
 				</MenuItem.Icon>
 			</MenuItem>
 		</MenuItem>
