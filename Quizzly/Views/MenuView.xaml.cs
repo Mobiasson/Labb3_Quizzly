@@ -49,4 +49,16 @@ public partial class MenuView : UserControl {
             setPackName.ShowDialog();
         }
     }
+
+    private void questionpack_button_Click(object sender, RoutedEventArgs e) {
+        if(Application.Current?.MainWindow?.DataContext is MainWindowViewModel mainVm) {
+            var createNewPack = new CreateNewPackDialog(mainVm) {
+                Owner = Window.GetWindow(this)
+            };
+            createNewPack.ShowDialog();
+        } else {
+            var createNewPack = new CreateNewPackDialog(new MainWindowViewModel());
+            createNewPack.ShowDialog();
+        }
+    }
 }

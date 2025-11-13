@@ -21,6 +21,9 @@ public class ConfigurationViewModel : ViewModelBase {
     private void MainVm_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if(e.PropertyName == nameof(MainWindowViewModel.ActivePack)) {
             SubscribeToActivePackQuestions(mainWindowViewModel?.ActivePack);
+            RaisePropertyChanged(nameof(ActivePack));
+            RaisePropertyChanged(nameof(Questions));
+            RaisePropertyChanged(nameof(SelectedQuestion));
             RaisePropertyChanged(nameof(QuestionCount));
         }
     }
@@ -32,6 +35,8 @@ public class ConfigurationViewModel : ViewModelBase {
         _subscribedPack = pack;
         if(_subscribedPack != null)
             _subscribedPack.Questions.CollectionChanged += Questions_CollectionChanged;
+        RaisePropertyChanged(nameof(ActivePack));
+        RaisePropertyChanged(nameof(Questions));
         RaisePropertyChanged(nameof(QuestionCount));
     }
 

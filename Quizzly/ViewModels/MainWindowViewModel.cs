@@ -3,6 +3,7 @@ using Quizzly.Command;
 using Quizzly.Http;
 using Quizzly.Models;
 using Quizzly.Views;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
@@ -62,16 +63,44 @@ public class MainWindowViewModel : ViewModelBase {
             var packVm = CreatePackVm(defaultPack);
             Packs.Add(packVm);
             ActivePack = packVm;
-            _ = GetQuestionsFromDatabase();
         } else {
             ActivePack = Packs[0];
         }
         PickRandomQuestion();
-        _ = GetQuestionsFromDatabase();
     }
 
     public QuestionPackViewModel CreatePackVm(QuestionPack model) {
         return new QuestionPackViewModel(this, model, RemovePackCommand);
+    }
+
+    public void AddAndActivatePack(string name, Difficulty difficulty, int timeLimitInSeconds, CategoryItem? category, bool overwriteActive = false) {
+        if(overwriteActive && ActivePack != null) {
+            // Update backing model (in-place) and the VM properties, and clear questions.
+            var m = ActivePack.Model;
+            m.Name = name;
+            m.Difficulty = difficulty;
+            m.TimeLimitInSeconds = timeLimitInSeconds;
+            m.CategoryId = category?.id ?? m.CategoryId;
+            m.Category = category?.name ?? m.Category;
+            m.Questions = new List<Question>();
+            ActivePack.Name = m.Name;
+            ActivePack.Difficulty = m.Difficulty;
+            ActivePack.TimeLimitInSeconds = m.TimeLimitInSeconds;
+            ActivePack.CategoryId = m.CategoryId;
+            ActivePack.Category = m.Category;
+            ActivePack.Questions.Clear();
+
+            SavePacks();
+            return;
+        }
+        var model = new QuestionPack(name, difficulty, timeLimitInSeconds, category?.id ?? 5) {
+            Category = category?.name ?? string.Empty,
+            Questions = new List<Question>()
+        };
+        var vm = CreatePackVm(model);
+        Packs.Add(vm);
+        ActivePack = vm;
+        SavePacks();
     }
 
     public int SelectedAmount {
@@ -191,10 +220,26 @@ public class MainWindowViewModel : ViewModelBase {
             Categories.Add(c);
     }
 
-    private void SavePacks() {
-        var raw = Packs.Select(vm => vm.Model).ToList();
-        var json = JsonConvert.SerializeObject(raw, Formatting.Indented);
-        File.WriteAllText(_filePath, json);
+    public void SavePacks() {
+        try {
+            foreach(var vm in Packs) {
+                var m = vm.Model;
+                m.Name = vm.Name;
+                m.Category = vm.Category;
+                m.CategoryId = vm.CategoryId;
+                m.Difficulty = vm.Difficulty;
+                m.TimeLimitInSeconds = vm.TimeLimitInSeconds;
+                m.SelectedQuestion = vm.SelectedQuestion;
+                m.Questions = vm.Questions.ToList();
+            }
+
+            var raw = Packs.Select(vm => vm.Model).ToList();
+            var json = JsonConvert.SerializeObject(raw, Formatting.Indented);
+            File.WriteAllText(_filePath, json);
+        }
+        catch(Exception ex) {
+            MessageBox.Show($"Failed saving packs.json: {ex.Message}", "Save error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void LoadPacks() {

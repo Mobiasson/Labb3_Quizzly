@@ -9,7 +9,7 @@
 	</UserControl.Resources>
 	<Menu>
 		<MenuItem Header="_File">
-			<MenuItem Header="_New Question Pack">
+			<MenuItem x:Name="questionpack_button" Header="_New Question Pack" Click="questionpack_button_Click">
 				<MenuItem.Icon>
 					<fa:FontAwesome Icon="File" />
 				</MenuItem.Icon>
