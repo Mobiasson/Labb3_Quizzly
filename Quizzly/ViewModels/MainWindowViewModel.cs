@@ -46,8 +46,8 @@ public class MainWindowViewModel : ViewModelBase {
         RemoveQuestionCommand = new DelegateCommand(RemoveQuestionExecute, CanRemoveQuestionExecute);
         RemovePackCommand = new DelegateCommand(RemovePackExecute, CanRemovePackExecute);
         PlayCommand = new DelegateCommand(ExecutePlay, CanPlay);
-        AddQuestionCommand = new DelegateCommand(AddQuestion, CanAddQuestion);
         ChangePackNameCommand = new DelegateCommand(ChangePackName, CanChangePackName);
+        AddQuestionCommand = new DelegateCommand(AddQuestion, CanAddQuestion);
         ConfigVM = new ConfigurationViewModel(this);
         PlayerVM = new PlayerViewModel(this);
         MenuVM = new MenuViewModel(this);
@@ -69,6 +69,25 @@ public class MainWindowViewModel : ViewModelBase {
         PickRandomQuestion();
     }
 
+    private bool CanAddQuestion(object? arg) => ActivePack != null && ActivePack.Questions.Count < 20;
+
+    private void AddQuestion(object? obj) {
+        if(ActivePack == null) return;
+        var confirm = MessageBox.Show(
+            "Are you sure you want to add a new blank question to the active pack?",
+            "Add Question",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+        if(confirm != MessageBoxResult.Yes) return;
+        var newQuestion = new Question("", "", "", "", "");
+        ActivePack.Questions.Add(newQuestion);
+        ActivePack.SelectedQuestion = newQuestion;
+        ConfigView?.ClearTextBoxes();
+        SavePacks();
+        RemoveQuestionCommand.RaiseCanExecuteChanged();
+        AddQuestionCommand.RaiseCanExecuteChanged();
+    }
+
     public QuestionPackViewModel CreatePackVm(QuestionPack model) {
         return new QuestionPackViewModel(this, model, RemovePackCommand);
     }
@@ -88,7 +107,6 @@ public class MainWindowViewModel : ViewModelBase {
             ActivePack.CategoryId = m.CategoryId;
             ActivePack.Category = m.Category;
             ActivePack.Questions.Clear();
-
             SavePacks();
             return;
         }
@@ -149,6 +167,7 @@ public class MainWindowViewModel : ViewModelBase {
             RaisePropertyChanged();
             PickRandomQuestion();
             RemoveQuestionCommand.RaiseCanExecuteChanged();
+            AddQuestionCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -179,15 +198,10 @@ public class MainWindowViewModel : ViewModelBase {
         SavePacks();
     }
 
-    private void AddQuestion(object? obj) {
-        ConfigView.PrepareAddQuestion();
-        CurrentView = ConfigView;
-    }
-
     private async void ExecutePlay(object? param) {
         if(ActivePack == null) return;
         if(ActivePack.Questions.Count == 0) {
-            var result = MessageBox.Show("Load 10 questions from API?", "No Questions", MessageBoxButton.YesNo); //Remember to change to dynamic number
+            var result = MessageBox.Show("Load 10 questions from API?", "No Questions", MessageBoxButton.YesNo);
             if(result == MessageBoxResult.Yes) {
                 await GetQuestionsFromDatabase();
             } else {
@@ -287,7 +301,6 @@ public class MainWindowViewModel : ViewModelBase {
     private bool CanRemovePackExecute(object? param) => param is QuestionPackViewModel;
     private bool CanPlay(object? param) => ActivePack?.Questions.Count > 0;
     private bool CanRemoveQuestionExecute(object? param) => ActivePack?.SelectedQuestion != null;
-    private bool CanAddQuestion(object? arg) => ActivePack?.Questions.Count <= 20;
     private bool CanChangePackName(object? arg) => ActivePack != null;
     public void SwitchToPlayer() => CurrentView = PlayerView;
     public void SwitchToConfiguration() => CurrentView = ConfigView;

@@ -28,7 +28,7 @@
 					<DataTemplate>
 						<TextBlock TextWrapping="Wrap" MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=ActualWidth}">
 							<Run Text="QUESTION: " FontWeight="Bold" />
-							<Run Text="{Binding Query, Mode=OneWay}" /></TextBlock>
+							<Run Text="{Binding Query}" /></TextBlock>
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
@@ -39,7 +39,7 @@
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 			<Label Grid.Row="0" Content="QUESTION:" FontSize="17" FontWeight="Bold" VerticalContentAlignment="Top" HorizontalAlignment="Left" Width="auto" Height="auto" Margin="25 0 0 0" />
-			<TextBox x:Name="question_textbox" Grid.Row="0" Margin="30" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.Query,Mode=OneWay}" TextWrapping="Wrap" />
+			<TextBox x:Name="question_textbox" Grid.Row="0" Margin="30" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.Query, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" />
 			<Grid Grid.Row="1">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="auto" />
@@ -62,22 +62,21 @@
 					</Grid.ColumnDefinitions>
 					<StackPanel Grid.Row="0" Grid.Column="0" Margin="5">
 						<Label Content="Correct Answer" />
-						<TextBox x:Name="correct_textbox" Margin="0 2 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.CorrectAnswer, Mode=OneWay}" TextWrapping="Wrap" Background="LightGreen" />
+						<TextBox x:Name="correct_textbox" Margin="0 2 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.CorrectAnswer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Background="LightGreen" />
 					</StackPanel>
 					<StackPanel Grid.Row="0" Grid.Column="1" Margin="5">
 						<Label Content="Incorrect Answer 1" />
-						<TextBox x:Name="incorrect1_textbox" Margin="0 2 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[0], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
+						<TextBox x:Name="incorrect1_textbox" Margin="0 2 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[0], Mode=TwoWay}" TextWrapping="Wrap" Background="IndianRed" />
 					</StackPanel>
 					<StackPanel Grid.Row="1" Grid.Column="0" Margin="5">
 						<Label Content="Incorrect Answer 2" />
-						<TextBox x:Name="incorrect2_textbox" Margin="0 2 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[1], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
+						<TextBox x:Name="incorrect2_textbox" Margin="0 2 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[1], Mode=TwoWay}" TextWrapping="Wrap" Background="IndianRed" />
 					</StackPanel>
 					<StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
 						<Label Content="Incorrect Answer 3" />
-						<TextBox x:Name="incorrect3_textbox" Margin="0 2 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=OneWay}" TextWrapping="Wrap" Background="IndianRed" />
-					</StackPanel>
+						<TextBox x:Name="incorrect3_textbox" Margin="0 2 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Background="IndianRed" />
+					</StackPanel> 
 				</Grid>
-				<Button x:Name="AddQuestion_button" Grid.Row="3" Grid.Column="0" Width="auto" Height="auto" Margin="10" Padding="5" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Hidden" Content="Add Question" Click="AddQuestion_button_Click" />
 				<Button Content="PLAY" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15" Padding="12,6" FontSize="16" FontWeight="Bold" Command="{Binding DataContext.PlayCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
 				<StackPanel Grid.Row="4" Margin="15 5 15 15">
 					<Label Content="Configurations:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" FontWeight="Bold" />
