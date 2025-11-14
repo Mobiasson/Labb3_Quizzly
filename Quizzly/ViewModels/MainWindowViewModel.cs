@@ -86,6 +86,7 @@ public class MainWindowViewModel : ViewModelBase {
         SavePacks();
         RemoveQuestionCommand.RaiseCanExecuteChanged();
         AddQuestionCommand.RaiseCanExecuteChanged();
+        PlayCommand.RaiseCanExecuteChanged();
     }
 
     public QuestionPackViewModel CreatePackVm(QuestionPack model) {
@@ -108,6 +109,7 @@ public class MainWindowViewModel : ViewModelBase {
             ActivePack.Category = m.Category;
             ActivePack.Questions.Clear();
             SavePacks();
+            PlayCommand.RaiseCanExecuteChanged();
             return;
         }
         var model = new QuestionPack(name, difficulty, timeLimitInSeconds, category?.id ?? 5) {
@@ -168,6 +170,7 @@ public class MainWindowViewModel : ViewModelBase {
             PickRandomQuestion();
             RemoveQuestionCommand.RaiseCanExecuteChanged();
             AddQuestionCommand.RaiseCanExecuteChanged();
+            PlayCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -196,6 +199,7 @@ public class MainWindowViewModel : ViewModelBase {
             ));
         }
         SavePacks();
+        PlayCommand.RaiseCanExecuteChanged(); 
     }
 
     private async void ExecutePlay(object? param) {
@@ -279,12 +283,14 @@ public class MainWindowViewModel : ViewModelBase {
             ActivePack.Questions.Remove(ActivePack.SelectedQuestion);
             ActivePack.SelectedQuestion = null;
             RemoveQuestionCommand.RaiseCanExecuteChanged();
+            PlayCommand.RaiseCanExecuteChanged();
         }
     }
     private void RemovePackExecute(object? param) {
         if(param is QuestionPackViewModel packVm && Packs.Contains(packVm)) {
             Packs.Remove(packVm);
             ActivePack = Packs.FirstOrDefault();
+            PlayCommand.RaiseCanExecuteChanged();
         }
     }
     private void ChangePackName(object? param) {

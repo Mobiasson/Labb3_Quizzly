@@ -1,6 +1,9 @@
 ﻿using Quizzly.Command;
 using Quizzly.Dialogs;
+using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 
 namespace Quizzly.ViewModels {
@@ -16,6 +19,7 @@ namespace Quizzly.ViewModels {
         public DelegateCommand SetPackNameCommand { get; }
         public DelegateCommand FullscreenCommand { get; }
         public DelegateCommand ActivatePackCommand { get; }
+        public DelegateCommand DeletePackCommand { get; }
 
         public ObservableCollection<QuestionPackViewModel> Packs => _mainVm.Packs;
         private readonly MainWindowViewModel _mainVm;
@@ -44,10 +48,37 @@ namespace Quizzly.ViewModels {
                     if(p is QuestionPackViewModel vm) {
                         _mainVm.ActivePack = vm;
                         _mainVm.SavePacks();
+                        DeletePackCommand.RaiseCanExecuteChanged();
                     }
                 },
                 p => p is QuestionPackViewModel
             );
+
+            DeletePackCommand = new DelegateCommand(
+                _ => DeleteActivePack(),
+                _ => _mainVm.ActivePack != null
+            );
+
+            _mainVm.PropertyChanged += MainVm_PropertyChanged;
+        }
+
+        private void MainVm_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+            if(e.PropertyName == nameof(MainWindowViewModel.ActivePack)) {
+                DeletePackCommand.RaiseCanExecuteChanged();
+            }
+        }
+        private void DeleteActivePack() {
+            var pack = _mainVm.ActivePack;
+            if(pack == null) return;
+            var result = MessageBox.Show(
+                $"Are you sure you want to delete '{pack.Name}'?",
+                "Delete Pack",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+            if(result != MessageBoxResult.Yes) return;
+            _mainVm.Packs.Remove(pack);
+            _mainVm.ActivePack = _mainVm.Packs.FirstOrDefault();
+            _mainVm.SavePacks();
         }
 
         private void CreateNewPack() {
