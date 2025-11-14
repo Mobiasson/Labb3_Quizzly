@@ -7,7 +7,6 @@
 			<Setter Property="HorizontalAlignment" Value="Center" />
 		</Style>
 	</UserControl.Resources>
-	<!-- Input Gestures -->
 	<UserControl.InputBindings>
 		<KeyBinding Key="N" Modifiers="Control" Command="{Binding NewPackCommand}" />
 		<KeyBinding Key="I" Modifiers="Control" Command="{Binding ImportPackCommand}" />
@@ -16,7 +15,6 @@
 		<KeyBinding Key="P" Modifiers="Control" Command="{Binding SetPackNameCommand}" />
 		<KeyBinding Key="O" Modifiers="Control" Command="{Binding PackOptionsCommand}" />
 		<KeyBinding Key="F11" Command="{Binding FullscreenCommand}" />
-		<!-- Add more if needed -->
 	</UserControl.InputBindings>
 	<Menu>
 		<MenuItem Header="_File">
@@ -24,6 +22,15 @@
 				<MenuItem.Icon>
 					<fa:FontAwesome Icon="File" />
 				</MenuItem.Icon>
+			</MenuItem>
+			<MenuItem Header="Saved Question Packs" ItemsSource="{Binding Packs}">
+				<MenuItem.ItemContainerStyle>
+					<Style TargetType="MenuItem">
+						<Setter Property="Header" Value="{Binding Name}" />
+						<Setter Property="Command" Value="{Binding DataContext.ActivatePackCommand, RelativeSource={RelativeSource AncestorType=Menu}}" />
+						<Setter Property="CommandParameter" Value="{Binding}" />
+					</Style>
+				</MenuItem.ItemContainerStyle>
 			</MenuItem>
 			<Separator />
 			<MenuItem Header="_Import Question Pack" InputGestureText="Ctrl+I" Command="{Binding ImportPackCommand}">

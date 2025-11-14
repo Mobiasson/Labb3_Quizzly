@@ -1,5 +1,6 @@
 ﻿using Quizzly.Command;
 using Quizzly.Dialogs;
+using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace Quizzly.ViewModels {
@@ -14,6 +15,9 @@ namespace Quizzly.ViewModels {
         public DelegateCommand PackOptionsCommand { get; }
         public DelegateCommand SetPackNameCommand { get; }
         public DelegateCommand FullscreenCommand { get; }
+        public DelegateCommand ActivatePackCommand { get; }
+
+        public ObservableCollection<QuestionPackViewModel> Packs => _mainVm.Packs;
         private readonly MainWindowViewModel _mainVm;
         private WindowStyle _prevWindowStyle;
         private ResizeMode _prevResizeMode;
@@ -34,6 +38,16 @@ namespace Quizzly.ViewModels {
             PackOptionsCommand = new DelegateCommand(_ => ShowPackOptions());
             SetPackNameCommand = new DelegateCommand(_ => ShowSetPackName());
             FullscreenCommand = new DelegateCommand(_ => ToggleFullscreen());
+
+            ActivatePackCommand = new DelegateCommand(
+                p => {
+                    if(p is QuestionPackViewModel vm) {
+                        _mainVm.ActivePack = vm;
+                        _mainVm.SavePacks();
+                    }
+                },
+                p => p is QuestionPackViewModel
+            );
         }
 
         private void CreateNewPack() {

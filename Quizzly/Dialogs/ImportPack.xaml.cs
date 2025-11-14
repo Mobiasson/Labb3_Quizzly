@@ -14,21 +14,26 @@ public partial class ImportPack : Window {
 
     private async void ImportButton_Click(object sender, RoutedEventArgs e) {
         try {
-            if(_mainVm.ActivePack == null) {
-                var defaultPack = new Models.QuestionPack("Defualt pack");
-                var vm = _mainVm.CreatePackVm(defaultPack);
-                _mainVm.Packs.Add(vm);
-                _mainVm.ActivePack = vm;
+            var category = _mainVm.CurrentCategory;
+            if(category == null) {
+                MessageBox.Show("Please select a category before importing.", "Missing category", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
+            var name = string.IsNullOrWhiteSpace(category.name) ? "Imported Pack" : category.name;
+            _mainVm.AddAndActivatePack(
+                name: name,
+                difficulty: _mainVm.CurrentDifficulty,
+                timeLimitInSeconds: (int)timerValue.Value,
+                category: category,
+                overwriteActive: false
+            );
             _mainVm.SetSelectedAmount((int)questionValue.Value);
-            _mainVm.ActivePack!.TimeLimitInSeconds = (int)timerValue.Value;
-            _mainVm.ActivePack!.Difficulty = _mainVm.CurrentDifficulty;
             await _mainVm.GetQuestionsFromDatabase();
-            MessageBox.Show($"Succesfully imported ");
+            MessageBox.Show($"Successfully imported \"{name}\".\nPrevious pack was saved and is available in Saved Question Packs.");
             DialogResult = true;
         }
         catch(Exception ex) {
-            MessageBox.Show("Something went wrong, you are a bit too fast. Try again" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Something went wrong, you are a bit too fast. Try again. " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
