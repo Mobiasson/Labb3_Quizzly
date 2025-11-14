@@ -1,8 +1,19 @@
 ﻿using Quizzly.Command;
+using Quizzly.Dialogs;
 using System.Windows;
 
 namespace Quizzly.ViewModels {
     public class MenuViewModel : ViewModelBase {
+        public DelegateCommand AddQuestionCommand { get; }
+        public DelegateCommand RemoveQuestionCommand { get; }
+        public DelegateCommand PlayCommand { get; }
+        public DelegateCommand ChangePackNameCommand { get; }
+        public DelegateCommand NewPackCommand { get; }
+        public DelegateCommand ImportPackCommand { get; }
+        public DelegateCommand ExitCommand { get; }
+        public DelegateCommand PackOptionsCommand { get; }
+        public DelegateCommand SetPackNameCommand { get; }
+        public DelegateCommand FullscreenCommand { get; }
         private readonly MainWindowViewModel _mainVm;
         private WindowStyle _prevWindowStyle;
         private ResizeMode _prevResizeMode;
@@ -13,13 +24,45 @@ namespace Quizzly.ViewModels {
 
         public MenuViewModel(MainWindowViewModel mainVm) {
             _mainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
+            AddQuestionCommand = _mainVm.AddQuestionCommand;
+            RemoveQuestionCommand = _mainVm.RemoveQuestionCommand;
+            PlayCommand = _mainVm.PlayCommand;
+            ChangePackNameCommand = _mainVm.ChangePackNameCommand;
+            NewPackCommand = new DelegateCommand(_ => CreateNewPack());
+            ImportPackCommand = new DelegateCommand(_ => ImportPack());
+            ExitCommand = new DelegateCommand(_ => ExitApp());
+            PackOptionsCommand = new DelegateCommand(_ => ShowPackOptions());
+            SetPackNameCommand = new DelegateCommand(_ => ShowSetPackName());
             FullscreenCommand = new DelegateCommand(_ => ToggleFullscreen());
         }
 
-        public DelegateCommand RemoveQuestionCommand => _mainVm.RemoveQuestionCommand;
-        public DelegateCommand AddQuestionCommand => _mainVm.AddQuestionCommand;
-        public DelegateCommand ChangePackNameCommand => _mainVm.ChangePackNameCommand;
-        public DelegateCommand FullscreenCommand { get; }
+        private void CreateNewPack() {
+            var owner = Application.Current?.MainWindow;
+            var dlg = new CreateNewPackDialog(_mainVm) { Owner = owner };
+            dlg.ShowDialog();
+        }
+
+        private void ImportPack() {
+            var owner = Application.Current?.MainWindow;
+            var dlg = new ImportPack(_mainVm) { Owner = owner };
+            dlg.ShowDialog();
+        }
+
+        private void ShowPackOptions() {
+            var owner = Application.Current?.MainWindow;
+            var dlg = new PackOptionsDialog(_mainVm) { Owner = owner };
+            dlg.ShowDialog();
+        }
+
+        private void ShowSetPackName() {
+            var owner = Application.Current?.MainWindow;
+            var dlg = new SetPackName(_mainVm) { Owner = owner };
+            dlg.ShowDialog();
+        }
+
+        private void ExitApp() {
+            Application.Current?.Shutdown();
+        }
 
         private void ToggleFullscreen() {
             var window = Application.Current?.MainWindow;
