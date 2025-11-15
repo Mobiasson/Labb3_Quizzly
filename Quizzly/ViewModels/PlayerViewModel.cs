@@ -133,7 +133,7 @@ public class PlayerViewModel : ViewModelBase {
             if(IsPlayOngoing || IsAnswered) return;
 
             IsAnswered = true;
-            _answerSelectCommand.RaiseCanExecuteChanged();
+            _answerSelectCommand?.RaiseCanExecuteChanged();
 
             StopTimer();
             var clickedText = (string)answerObj!;
@@ -142,9 +142,8 @@ public class PlayerViewModel : ViewModelBase {
 
             foreach(var opt in Answers) opt.Background = Brushes.LightGray;
             var clicked = Answers.FirstOrDefault(o => o.Text == clickedText);
-            if(clicked != null) {
+            if(clicked != null)
                 clicked.Background = isCorrect ? Brushes.Green : Brushes.IndianRed;
-            }
 
             await Task.Delay(900);
             if(IsPlayOngoing) return;
