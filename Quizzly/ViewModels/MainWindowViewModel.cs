@@ -20,8 +20,8 @@ public class MainWindowViewModel : ViewModelBase {
     private QuestionPackViewModel? _activePack;
     private Question? _currentQuestion;
     private readonly SemaphoreSlim _importLock = new(1, 1);
-    private PlayerViewModel? _runningPlayer;
-    private bool _isPlaying;
+    private PlayerViewModel? OngoingPlay;
+    private bool IsPlayOngoing;
 
     public IEnumerable<Difficulty> Difficulties => Enum.GetValues<Difficulty>();
     public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
@@ -192,10 +192,10 @@ public class MainWindowViewModel : ViewModelBase {
     }
 
     public bool IsPlaying {
-        get => _isPlaying;
+        get => IsPlayOngoing;
         private set {
-            if(_isPlaying == value) return;
-            _isPlaying = value;
+            if(IsPlayOngoing == value) return;
+            IsPlayOngoing = value;
             RaisePropertyChanged(nameof(IsPlaying));
             StopPlayingCommand.RaiseCanExecuteChanged();
         }
@@ -249,10 +249,10 @@ public class MainWindowViewModel : ViewModelBase {
                 return;
             }
         }
-        _runningPlayer = new PlayerViewModel(this);
-        _runningPlayer.StartQuiz();
+        OngoingPlay = new PlayerViewModel(this);
+        OngoingPlay.StartQuiz();
         IsPlaying = true;
-        CurrentView = new PlayerView { DataContext = _runningPlayer };
+        CurrentView = new PlayerView { DataContext = OngoingPlay };
     }
     public async Task RestartAsync() {
         await LoadCategoriesAsync();
@@ -341,18 +341,20 @@ public class MainWindowViewModel : ViewModelBase {
 
     public void StopPlaying() {
         if(!IsPlaying) { CurrentView = ConfigView; return; }
-        _runningPlayer?.Stop();
-        _runningPlayer = null;
+        OngoingPlay?.Stop();
+        OngoingPlay = null;
         IsPlaying = false;
         CurrentView = ConfigView;
     }
 
     public void SwitchToEnd(int correctAnswers, int totalQuestions) {
-        _runningPlayer?.Stop();
-        _runningPlayer = null;
+        OngoingPlay?.Stop();
+        OngoingPlay = null;
         IsPlaying = false;
         CurrentView = new EndView { DataContext = new EndViewModel(this, correctAnswers, totalQuestions) };
     }
+
+
 
     private bool CanRemovePackExecute(object? param) => param is QuestionPackViewModel;
     private bool CanPlay(object? param) => ActivePack?.Questions.Count > 0;

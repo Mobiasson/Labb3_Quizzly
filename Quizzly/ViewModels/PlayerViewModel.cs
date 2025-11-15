@@ -22,11 +22,13 @@ public class AnswerOption : ViewModelBase {
             }
         }
     }
+
     public AnswerOption(string text, DelegateCommand selectCommand) {
         Text = text;
         SelectCommand = selectCommand;
     }
 }
+
 public class PlayerViewModel : ViewModelBase {
     private readonly MainWindowViewModel _mainVm;
     private readonly Random _rnd = new();
@@ -38,9 +40,12 @@ public class PlayerViewModel : ViewModelBase {
     private TimeSpan _timeRemaining = TimeSpan.Zero;
     private Question? _currentQuestion;
     private int _correctAnswers;
+    private bool IsAnswered;
+    private bool IsPlayOngoing;
+    private DelegateCommand? _answerSelectCommand;
+
     public ObservableCollection<AnswerOption> Answers { get; } = new();
     public DelegateCommand BackCommand { get; }
-
 
     public Question? CurrentQuestion {
         get => _currentQuestion;
@@ -65,10 +70,6 @@ public class PlayerViewModel : ViewModelBase {
         }
     }
 
-    private bool _hasAnsweredCurrent;
-    private bool _isStopped;
-    private DelegateCommand? _answerSelectCommand;
-
     public PlayerViewModel(MainWindowViewModel mainVm) {
         _mainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
         BackCommand = new DelegateCommand(_ => _mainVm.StopPlaying());
@@ -80,25 +81,37 @@ public class PlayerViewModel : ViewModelBase {
     public void StartQuiz() {
         if(ActivePack?.Questions == null || ActivePack.Questions.Count == 0) {
             MessageBox.Show("No questions in this pack!");
-            _mainVm.SwitchToConfiguration();
+            _mainVm.StopPlaying();
             return;
         }
+        IsPlayOngoing = false;
         _correctAnswers = 0;
         shuffles = Enumerable.Range(0, ActivePack.Questions.Count)
-                                    .OrderBy(_ => _rnd.Next())
-                                    .ToArray();
+                             .OrderBy(_ => _rnd.Next())
+                             .ToArray();
         _currentIndex = 0;
         ShowCurrentQuestion();
     }
 
+    public void Stop() {
+        IsPlayOngoing = true;
+        StopTimer();
+        _answerSelectCommand?.RaiseCanExecuteChanged();
+    }
+
     private void ShowCurrentQuestion() {
+        if(IsPlayOngoing) return;
+
         if(shuffles == null || _currentIndex >= shuffles.Length) {
             StopTimer();
             int total = shuffles?.Length ?? ActivePack.Questions.Count;
             _mainVm.SwitchToEnd(_correctAnswers, total);
             return;
         }
+
         int idx = shuffles[_currentIndex];
+        IsAnswered = false;
+        _answerSelectCommand?.RaiseCanExecuteChanged();
         CurrentQuestion = ActivePack.Questions[idx];
         _initialSeconds = ActivePack?.TimeLimitInSeconds ?? 30;
         StartTimer(_initialSeconds);
@@ -115,25 +128,38 @@ public class PlayerViewModel : ViewModelBase {
             .Concat(CurrentQuestion.IncorrectAnswers)
             .OrderBy(_ => _rnd.Next())
             .ToList();
-        var selectCmd = new DelegateCommand(async answerObj => {
+
+        _answerSelectCommand = new DelegateCommand(async answerObj => {
+            if(IsPlayOngoing || IsAnswered) return;
+
+            IsAnswered = true;
+            _answerSelectCommand.RaiseCanExecuteChanged();
+
             StopTimer();
             var clickedText = (string)answerObj!;
-            bool isCorrect = clickedText == CurrentQuestion.CorrectAnswer;
+            bool isCorrect = clickedText == CurrentQuestion!.CorrectAnswer;
             if(isCorrect) _correctAnswers++;
+
             foreach(var opt in Answers) opt.Background = Brushes.LightGray;
             var clicked = Answers.FirstOrDefault(o => o.Text == clickedText);
             if(clicked != null) {
                 clicked.Background = isCorrect ? Brushes.Green : Brushes.IndianRed;
             }
+
             await Task.Delay(900);
+            if(IsPlayOngoing) return;
+
             _currentIndex++;
             ShowCurrentQuestion();
-        });
+        },
+        _ => !IsAnswered && !IsPlayOngoing);
+
         foreach(var text in options)
-            Answers.Add(new AnswerOption(text, selectCmd));
+            Answers.Add(new AnswerOption(text, _answerSelectCommand));
     }
 
     private void StartTimer(int seconds) {
+        if(IsPlayOngoing) return;
         TimeRemaining = TimeSpan.FromSeconds(seconds);
         _stopwatch.Restart();
         if(!_timer.IsEnabled) _timer.Start();
@@ -145,19 +171,25 @@ public class PlayerViewModel : ViewModelBase {
     }
 
     private void Timer_Tick(object? sender, EventArgs e) {
+        if(IsPlayOngoing) return;
+
         var elapsed = _stopwatch.Elapsed;
         var remaining = TimeSpan.FromSeconds(_initialSeconds) - elapsed;
         if(remaining <= TimeSpan.Zero) {
             TimeRemaining = TimeSpan.Zero;
             StopTimer();
             OnTimeExpired();
-
         } else {
             TimeRemaining = remaining;
         }
     }
 
     private void OnTimeExpired() {
+        if(IsPlayOngoing) return;
+
+        IsAnswered = true;
+        _answerSelectCommand?.RaiseCanExecuteChanged();
+
         MessageBox.Show("Time is up, can't you read?", "You ran out of time!", MessageBoxButton.OK, MessageBoxImage.Information);
         _currentIndex++;
         ShowCurrentQuestion();
@@ -168,7 +200,4 @@ public class PlayerViewModel : ViewModelBase {
     public QuestionPackViewModel ActivePack => _mainVm.ActivePack!;
     public string TimeRemainingDisplay => TimeRemaining.ToString(@"mm\:ss");
     public string QuestionProgress => $"{CurrentQuestionNumber}/{TotalQuestions}";
-    public void Stop() {
-        StopTimer();
-    }
 }
