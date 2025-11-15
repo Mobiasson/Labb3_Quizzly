@@ -1,7 +1,6 @@
 ﻿using Quizzly.ViewModels;
 using System.Windows;
-using System.Windows.Controls; // Button
-using System.Net.Http;
+using System.Windows.Controls;
 
 namespace Quizzly.Dialogs;
 
@@ -41,7 +40,7 @@ public partial class ImportPack : Window {
             );
             _mainVm.SetSelectedAmount(amount);
             await _mainVm.GetQuestionsFromDatabase();
-            MessageBox.Show($"Successfully imported \"{name}\".\nPrevious pack was saved and is available in Saved Question Packs.");
+            MessageBox.Show($"Successfully imported \"{name}\".\nPrevious pack was saved in File => Saved Question Packs");
             DialogResult = true;
         }
         finally {

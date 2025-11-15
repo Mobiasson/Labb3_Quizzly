@@ -20,6 +20,7 @@ namespace Quizzly.ViewModels {
         public DelegateCommand FullscreenCommand { get; }
         public DelegateCommand ActivatePackCommand { get; }
         public DelegateCommand DeletePackCommand { get; }
+        public DelegateCommand StopPlayingCommand { get; }
 
         public ObservableCollection<QuestionPackViewModel> Packs => _mainVm.Packs;
         private readonly MainWindowViewModel _mainVm;
@@ -42,6 +43,7 @@ namespace Quizzly.ViewModels {
             PackOptionsCommand = new DelegateCommand(_ => ShowPackOptions());
             SetPackNameCommand = new DelegateCommand(_ => ShowSetPackName());
             FullscreenCommand = new DelegateCommand(_ => ToggleFullscreen());
+            StopPlayingCommand = _mainVm.StopPlayingCommand;
 
             ActivatePackCommand = new DelegateCommand(
                 p => {
@@ -65,6 +67,10 @@ namespace Quizzly.ViewModels {
         private void MainVm_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
             if(e.PropertyName == nameof(MainWindowViewModel.ActivePack)) {
                 DeletePackCommand.RaiseCanExecuteChanged();
+            }
+            // keep MenuView in sync if you bind IsEnabled elsewhere
+            if(e.PropertyName == nameof(MainWindowViewModel.IsPlaying)) {
+                StopPlayingCommand.RaiseCanExecuteChanged();
             }
         }
         private void DeleteActivePack() {

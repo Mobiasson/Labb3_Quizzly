@@ -3,12 +3,10 @@ using Quizzly.Command;
 using Quizzly.Http;
 using Quizzly.Models;
 using Quizzly.Views;
-using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Threading; // added
 using System.Windows;
 
 namespace Quizzly.ViewModels;
@@ -21,9 +19,9 @@ public class MainWindowViewModel : ViewModelBase {
     private int _selectedAmount = 10;
     private QuestionPackViewModel? _activePack;
     private Question? _currentQuestion;
-
-    // Serialize imports to avoid overlapping fetch/fill
     private readonly SemaphoreSlim _importLock = new(1, 1);
+    private PlayerViewModel? _runningPlayer;
+    private bool _isPlaying;
 
     public IEnumerable<Difficulty> Difficulties => Enum.GetValues<Difficulty>();
     public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
@@ -41,6 +39,7 @@ public class MainWindowViewModel : ViewModelBase {
     public DelegateCommand PlayCommand { get; }
     public DelegateCommand AddQuestionCommand { get; }
     public DelegateCommand ChangePackNameCommand { get; }
+    public DelegateCommand StopPlayingCommand { get; }
 
     public MainWindowViewModel() {
         var folder = Path.Combine(
@@ -53,6 +52,7 @@ public class MainWindowViewModel : ViewModelBase {
         PlayCommand = new DelegateCommand(ExecutePlay, CanPlay);
         ChangePackNameCommand = new DelegateCommand(ChangePackName, CanChangePackName);
         AddQuestionCommand = new DelegateCommand(AddQuestion, CanAddQuestion);
+        StopPlayingCommand = new DelegateCommand(_ => StopPlaying(), _ => IsPlaying);
         ConfigVM = new ConfigurationViewModel(this);
         PlayerVM = new PlayerViewModel(this);
         MenuVM = new MenuViewModel(this);
@@ -63,7 +63,6 @@ public class MainWindowViewModel : ViewModelBase {
         CurrentView = ConfigView;
         LoadPacks();
         _ = LoadCategoriesAsync();
-
         if(Packs.Count == 0) {
             var defaultPack = new QuestionPack("Default Pack");
             var packVm = CreatePackVm(defaultPack);
@@ -178,15 +177,13 @@ public class MainWindowViewModel : ViewModelBase {
             if(_activePack == value) return;
             _activePack = value;
             RaisePropertyChanged();
-
             if(value != null) {
                 int idx = Packs.IndexOf(value);
                 if(idx > 0) {
-                    Packs.Move(idx, 0); // keep active pack first
+                    Packs.Move(idx, 0);
                 }
-                SavePacks(); // persist order so it restores next run
+                SavePacks();
             }
-
             PickRandomQuestion();
             RemoveQuestionCommand.RaiseCanExecuteChanged();
             AddQuestionCommand.RaiseCanExecuteChanged();
@@ -194,31 +191,35 @@ public class MainWindowViewModel : ViewModelBase {
         }
     }
 
-    public async Task GetQuestionsFromDatabase() {
-        if (ActivePack == null) return;
-        if (_selectedCategory == null) return;
+    public bool IsPlaying {
+        get => _isPlaying;
+        private set {
+            if(_isPlaying == value) return;
+            _isPlaying = value;
+            RaisePropertyChanged(nameof(IsPlaying));
+            StopPlayingCommand.RaiseCanExecuteChanged();
+        }
+    }
 
+    public async Task GetQuestionsFromDatabase() {
+        if(ActivePack == null) return;
+        if(_selectedCategory == null) return;
         await _importLock.WaitAsync();
         try {
             string diff = _selectedDifficulty.ToString().ToLower();
             int categoryId = _selectedCategory.id;
             int amount = _selectedAmount;
             string url = $"https://opentdb.com/api.php?amount={amount}&category={categoryId}&type=multiple&difficulty={diff}";
-
             string json = await http.GetStringAsync(url);
             var result = JsonConvert.DeserializeObject<ReadJson>(json);
-
-            if (result?.results == null || result.results.Count == 0) return;
-
+            if(result?.results == null || result.results.Count == 0) return;
             string categoryName = HtmlDecode(result.results[0].category);
-
-            // update pack content atomically
             ActivePack.Name = categoryName;
             ActivePack.Category = categoryName;
             ActivePack.CategoryId = categoryId;
 
             ActivePack.Questions.Clear();
-            foreach (var q in result.results) {
+            foreach(var q in result.results) {
                 ActivePack.Questions.Add(new Question(
                     query: HtmlDecode(q.question),
                     correctAnswer: HtmlDecode(q.correct_answer),
@@ -227,15 +228,11 @@ public class MainWindowViewModel : ViewModelBase {
                     incorrectAnswer3: HtmlDecode(q.incorrect_answers[2])
                 ));
             }
-
             SavePacks();
             PlayCommand.RaiseCanExecuteChanged();
         }
-        catch (HttpRequestException ex) {
+        catch(HttpRequestException ex) {
             MessageBox.Show("Network error while loading questions. Try again.\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-        catch (Newtonsoft.Json.JsonException ex) {
-            MessageBox.Show("Could not parse questions from API. Try again.\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally {
             _importLock.Release();
@@ -252,9 +249,10 @@ public class MainWindowViewModel : ViewModelBase {
                 return;
             }
         }
-        var playerVM = new PlayerViewModel(this);
-        playerVM.StartQuiz();
-        CurrentView = new PlayerView { DataContext = playerVM };
+        _runningPlayer = new PlayerViewModel(this);
+        _runningPlayer.StartQuiz();
+        IsPlaying = true;
+        CurrentView = new PlayerView { DataContext = _runningPlayer };
     }
     public async Task RestartAsync() {
         await LoadCategoriesAsync();
@@ -341,7 +339,18 @@ public class MainWindowViewModel : ViewModelBase {
         SavePacks();
     }
 
+    public void StopPlaying() {
+        if(!IsPlaying) { CurrentView = ConfigView; return; }
+        _runningPlayer?.Stop();
+        _runningPlayer = null;
+        IsPlaying = false;
+        CurrentView = ConfigView;
+    }
+
     public void SwitchToEnd(int correctAnswers, int totalQuestions) {
+        _runningPlayer?.Stop();
+        _runningPlayer = null;
+        IsPlaying = false;
         CurrentView = new EndView { DataContext = new EndViewModel(this, correctAnswers, totalQuestions) };
     }
 

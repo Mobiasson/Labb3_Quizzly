@@ -11,6 +11,6 @@ public partial class PlayerView : UserControl {
 
     private void Back_Click(object sender, RoutedEventArgs e) {
         var mainVm = (MainWindowViewModel)Application.Current.MainWindow.DataContext;
-        mainVm.SwitchToConfiguration();
+        mainVm.StopPlaying();
     }
 }
