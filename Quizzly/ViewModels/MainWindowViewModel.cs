@@ -20,6 +20,7 @@ public class MainWindowViewModel : ViewModelBase {
     private int _selectedAmount = 10;
     private QuestionPackViewModel? _activePack;
     private Question? _currentQuestion;
+    private readonly string _metaPath;
     public IEnumerable<Difficulty> Difficulties => Enum.GetValues<Difficulty>();
     public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
     public ObservableCollection<CategoryItem> Categories { get; } = new();
@@ -58,6 +59,7 @@ public class MainWindowViewModel : ViewModelBase {
         CurrentView = ConfigView;
         LoadPacks();
         _ = LoadCategoriesAsync();
+
         if(Packs.Count == 0) {
             var defaultPack = new QuestionPack("Default Pack");
             var packVm = CreatePackVm(defaultPack);
@@ -69,10 +71,13 @@ public class MainWindowViewModel : ViewModelBase {
         PickRandomQuestion();
     }
 
-    private bool CanAddQuestion(object? arg) => ActivePack != null && ActivePack.Questions.Count < 20;
 
     private void AddQuestion(object? obj) {
         if(ActivePack == null) return;
+        if(ActivePack.Questions.Count >= 20) {
+            MessageBox.Show("You cannot add above 20 questions, remove one to add another.");
+            return;
+        }
         var confirm = MessageBox.Show(
             "Are you sure you want to add a new blank question to the active pack?",
             "Add Question",
@@ -122,6 +127,7 @@ public class MainWindowViewModel : ViewModelBase {
         SavePacks();
     }
 
+
     public int SelectedAmount {
         get => _selectedAmount;
         set {
@@ -165,8 +171,18 @@ public class MainWindowViewModel : ViewModelBase {
     public QuestionPackViewModel? ActivePack {
         get => _activePack;
         set {
+            if(_activePack == value) return;
             _activePack = value;
             RaisePropertyChanged();
+
+            if(value != null) {
+                int idx = Packs.IndexOf(value);
+                if(idx > 0) {
+                    Packs.Move(idx, 0); // keep active pack first
+                }
+                SavePacks(); // persist order so it restores next run
+            }
+
             PickRandomQuestion();
             RemoveQuestionCommand.RaiseCanExecuteChanged();
             AddQuestionCommand.RaiseCanExecuteChanged();
@@ -199,7 +215,7 @@ public class MainWindowViewModel : ViewModelBase {
             ));
         }
         SavePacks();
-        PlayCommand.RaiseCanExecuteChanged(); 
+        PlayCommand.RaiseCanExecuteChanged();
     }
 
     private async void ExecutePlay(object? param) {
@@ -269,6 +285,7 @@ public class MainWindowViewModel : ViewModelBase {
             Packs.Add(CreatePackVm(p));
         }
     }
+
     public void PickRandomQuestion() {
         if(ActivePack?.Questions.Count > 0) {
             var rnd = new Random();
@@ -314,5 +331,7 @@ public class MainWindowViewModel : ViewModelBase {
     public void OnWindowClosing() => SavePacks();
     public void SetSelectedAmount(int amount) => SelectedAmount = amount;
     private static string HtmlDecode(string text) => WebUtility.HtmlDecode(text);
+    private bool CanAddQuestion(object? arg) => ActivePack != null;
+
 
 }
