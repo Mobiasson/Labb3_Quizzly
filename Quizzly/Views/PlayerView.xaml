@@ -36,6 +36,7 @@
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
+			<Button Grid.Column="0" Content="Stop play" Padding="10,6" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Center" Click="Back_Click" />
 			<TextBlock Grid.Column="1" Text="{Binding TimeRemainingDisplay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="8" />
 			<Label Grid.Column="2" Content="{Binding QuestionProgress}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,10,0" FontSize="20" FontWeight="Bold" />
 		</Grid>

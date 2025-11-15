@@ -10,7 +10,10 @@ public partial class PlayerView : UserControl {
     }
 
     private void Back_Click(object sender, RoutedEventArgs e) {
+        if(DataContext is PlayerViewModel pvm) {
+            pvm.Stop();
+        }
         var mainVm = (MainWindowViewModel)Application.Current.MainWindow.DataContext;
-        mainVm.StopPlaying();
+        mainVm.SwitchToConfiguration();
     }
 }
