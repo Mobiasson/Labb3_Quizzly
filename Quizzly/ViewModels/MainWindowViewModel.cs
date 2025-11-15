@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading; // added
 using System.Windows;
 
 namespace Quizzly.ViewModels;
@@ -20,7 +21,10 @@ public class MainWindowViewModel : ViewModelBase {
     private int _selectedAmount = 10;
     private QuestionPackViewModel? _activePack;
     private Question? _currentQuestion;
-    private readonly string _metaPath;
+
+    // Serialize imports to avoid overlapping fetch/fill
+    private readonly SemaphoreSlim _importLock = new(1, 1);
+
     public IEnumerable<Difficulty> Difficulties => Enum.GetValues<Difficulty>();
     public ObservableCollection<QuestionPackViewModel> Packs { get; } = new();
     public ObservableCollection<CategoryItem> Categories { get; } = new();
@@ -191,31 +195,51 @@ public class MainWindowViewModel : ViewModelBase {
     }
 
     public async Task GetQuestionsFromDatabase() {
-        if(ActivePack == null) return;
-        if(_selectedCategory == null) return;
-        string diff = _selectedDifficulty.ToString().ToLower();
-        int categoryId = _selectedCategory.id;
-        int amount = _selectedAmount;
-        string url = $"https://opentdb.com/api.php?amount={amount}&category={categoryId}&type=multiple&difficulty={diff}";
-        string json = await http.GetStringAsync(url);
-        var result = JsonConvert.DeserializeObject<ReadJson>(json);
-        if(result?.results == null || result.results.Count == 0) return;
-        string categoryName = HtmlDecode(result.results[0].category);
-        ActivePack.Name = categoryName;
-        ActivePack.Category = categoryName;
-        ActivePack.CategoryId = categoryId;
-        ActivePack.Questions.Clear();
-        foreach(var q in result.results) {
-            ActivePack.Questions.Add(new Question(
-                query: HtmlDecode(q.question),
-                correctAnswer: HtmlDecode(q.correct_answer),
-                incorrectAnswer1: HtmlDecode(q.incorrect_answers[0]),
-                incorrectAnswer2: HtmlDecode(q.incorrect_answers[1]),
-                incorrectAnswer3: HtmlDecode(q.incorrect_answers[2])
-            ));
+        if (ActivePack == null) return;
+        if (_selectedCategory == null) return;
+
+        await _importLock.WaitAsync();
+        try {
+            string diff = _selectedDifficulty.ToString().ToLower();
+            int categoryId = _selectedCategory.id;
+            int amount = _selectedAmount;
+            string url = $"https://opentdb.com/api.php?amount={amount}&category={categoryId}&type=multiple&difficulty={diff}";
+
+            string json = await http.GetStringAsync(url);
+            var result = JsonConvert.DeserializeObject<ReadJson>(json);
+
+            if (result?.results == null || result.results.Count == 0) return;
+
+            string categoryName = HtmlDecode(result.results[0].category);
+
+            // update pack content atomically
+            ActivePack.Name = categoryName;
+            ActivePack.Category = categoryName;
+            ActivePack.CategoryId = categoryId;
+
+            ActivePack.Questions.Clear();
+            foreach (var q in result.results) {
+                ActivePack.Questions.Add(new Question(
+                    query: HtmlDecode(q.question),
+                    correctAnswer: HtmlDecode(q.correct_answer),
+                    incorrectAnswer1: HtmlDecode(q.incorrect_answers[0]),
+                    incorrectAnswer2: HtmlDecode(q.incorrect_answers[1]),
+                    incorrectAnswer3: HtmlDecode(q.incorrect_answers[2])
+                ));
+            }
+
+            SavePacks();
+            PlayCommand.RaiseCanExecuteChanged();
         }
-        SavePacks();
-        PlayCommand.RaiseCanExecuteChanged();
+        catch (HttpRequestException ex) {
+            MessageBox.Show("Network error while loading questions. Try again.\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        catch (Newtonsoft.Json.JsonException ex) {
+            MessageBox.Show("Could not parse questions from API. Try again.\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally {
+            _importLock.Release();
+        }
     }
 
     private async void ExecutePlay(object? param) {
