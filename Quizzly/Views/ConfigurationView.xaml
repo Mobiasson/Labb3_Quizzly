@@ -75,7 +75,7 @@
 					<StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
 						<Label Content="Incorrect Answer 3" />
 						<TextBox x:Name="incorrect3_textbox" Margin="0 2 0 0" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ActivePack.SelectedQuestion.IncorrectAnswers[2], Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Background="IndianRed" />
-					</StackPanel> 
+					</StackPanel>
 				</Grid>
 				<Button Content="PLAY" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15" Padding="12,6" FontSize="16" FontWeight="Bold" Command="{Binding DataContext.PlayCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
 				<StackPanel Grid.Row="4" Margin="15 5 15 15">

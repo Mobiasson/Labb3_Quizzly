@@ -8,6 +8,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Windows;
+using System.Threading;
 
 namespace Quizzly.ViewModels;
 public class MainWindowViewModel : ViewModelBase {
@@ -56,6 +57,7 @@ public class MainWindowViewModel : ViewModelBase {
         ConfigVM = new ConfigurationViewModel(this);
         PlayerVM = new PlayerViewModel(this);
         MenuVM = new MenuViewModel(this);
+        EndVM = new EndViewModel(this, 0, 0);
         ConfigView = new ConfigurationView { DataContext = ConfigVM };
         PlayerView = new PlayerView { DataContext = PlayerVM };
         EndView = new EndView { DataContext = EndVM };
@@ -196,14 +198,14 @@ public class MainWindowViewModel : ViewModelBase {
         private set {
             if(IsPlayOngoing == value) return;
             IsPlayOngoing = value;
-            RaisePropertyChanged(nameof(IsPlaying));
+            RaisePropertyChanged();
             StopPlayingCommand.RaiseCanExecuteChanged();
         }
     }
 
     public async Task GetQuestionsFromDatabase() {
-        if(ActivePack == null) return;
-        if(_selectedCategory == null) return;
+        var targetPack = ActivePack;
+        if(targetPack == null || _selectedCategory == null) return;
         await _importLock.WaitAsync();
         try {
             string diff = _selectedDifficulty.ToString().ToLower();
@@ -213,19 +215,21 @@ public class MainWindowViewModel : ViewModelBase {
             string json = await http.GetStringAsync(url);
             var result = JsonConvert.DeserializeObject<ReadJson>(json);
             if(result?.results == null || result.results.Count == 0) return;
+            if(targetPack != ActivePack) return;
             string categoryName = HtmlDecode(result.results[0].category);
-            ActivePack.Name = categoryName;
-            ActivePack.Category = categoryName;
-            ActivePack.CategoryId = categoryId;
-
-            ActivePack.Questions.Clear();
+            targetPack.Name = categoryName;
+            targetPack.Category = categoryName;
+            targetPack.CategoryId = categoryId;
+            targetPack.Questions.Clear();
             foreach(var q in result.results) {
+                var incorrect = q.incorrect_answers ?? new List<string>();
+                while(incorrect.Count < 3) incorrect.Add(string.Empty);
                 ActivePack.Questions.Add(new Question(
-                    query: HtmlDecode(q.question),
-                    correctAnswer: HtmlDecode(q.correct_answer),
-                    incorrectAnswer1: HtmlDecode(q.incorrect_answers[0]),
-                    incorrectAnswer2: HtmlDecode(q.incorrect_answers[1]),
-                    incorrectAnswer3: HtmlDecode(q.incorrect_answers[2])
+                    HtmlDecode(q.question),
+                    HtmlDecode(q.correct_answer),
+                    HtmlDecode(incorrect[0]),
+                    HtmlDecode(incorrect[1]),
+                    HtmlDecode(incorrect[2])
                 ));
             }
             SavePacks();
@@ -239,15 +243,12 @@ public class MainWindowViewModel : ViewModelBase {
         }
     }
 
-    private async void ExecutePlay(object? param) {
+    private async void ExecutePlay(object? _) {
         if(ActivePack == null) return;
         if(ActivePack.Questions.Count == 0) {
-            var result = MessageBox.Show("Load 10 questions from API?", "No Questions", MessageBoxButton.YesNo);
-            if(result == MessageBoxResult.Yes) {
+            if(MessageBox.Show("Load 10 questions from API?", "No Questions", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 await GetQuestionsFromDatabase();
-            } else {
-                return;
-            }
+            else return;
         }
         OngoingPlay = new PlayerViewModel(this);
         OngoingPlay.StartQuiz();
@@ -308,10 +309,10 @@ public class MainWindowViewModel : ViewModelBase {
         }
     }
 
+    private readonly Random _random = new Random();
     public void PickRandomQuestion() {
         if(ActivePack?.Questions.Count > 0) {
-            var rnd = new Random();
-            int index = rnd.Next(ActivePack.Questions.Count);
+            int index = _random.Next(ActivePack.Questions.Count);
             CurrentQuestion = ActivePack.Questions[index];
         } else {
             CurrentQuestion = null;
@@ -340,7 +341,7 @@ public class MainWindowViewModel : ViewModelBase {
     }
 
     public void StopPlaying() {
-        if(!IsPlaying) { CurrentView = ConfigView; return; }
+        if(!IsPlayOngoing) { CurrentView = ConfigView; return; }
         OngoingPlay?.Stop();
         OngoingPlay = null;
         IsPlaying = false;
